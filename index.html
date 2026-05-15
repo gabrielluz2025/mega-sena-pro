@@ -922,6 +922,8 @@ async function iniciarSistema() {
     // Data de hoje no modal
     const dataEl = document.getElementById('novoResultadoData');
     if(dataEl) dataEl.value = new Date().toISOString().split('T')[0];
+    // Gerar sugestões retroativas automaticamente em background
+    gerarSugestoesRetroativasAuto();
 }
 
 // ============================================================
@@ -1631,6 +1633,61 @@ function regenerarSugestao(cId) {
     salvarSugestoesIA();
     renderizarTabelaHistorico();
     showToast('Sugestão regenerada para #' + cId + ': ' + numeros.join(', '), 'success');
+}
+
+// Geração automática silenciosa ao iniciar o sistema
+async function gerarSugestoesRetroativasAuto() {
+    if (!estatisticas || !estatisticas.frequencia) return;
+    // Verificar quantos concursos ainda não têm sugestão
+    var todos = historicoSorteios.concat(concursosCustomizados);
+    var semSugestao = todos.filter(function(c){
+        var cId = c.concurso||c.id||0;
+        return !historicoSugestoesIA.find(function(s){return s.concursoId===cId;});
+    });
+    // Se todos já têm sugestão, não precisa fazer nada
+    if (semSugestao.length === 0) {
+        showToast('Histórico IA: ' + historicoSugestoesIA.length + ' sugestões já disponíveis ✓', 'success');
+        return;
+    }
+    // Mostrar indicador no header
+    var badge = document.getElementById('headerAiStatus');
+    var badgeText = document.getElementById('headerAiText');
+    if(badge) { badge.classList.remove('hidden'); badge.className = 'ai-badge learning hidden md:flex'; }
+    if(badgeText) badgeText.textContent = 'IA Gerando histórico...';
+    showToast('Gerando sugestões para ' + semSugestao.length + ' concursos em background...', 'info', 5000);
+    var sorted = Object.entries(estatisticas.frequencia).map(function(e){return {numero:parseInt(e[0]),freq:e[1]};}).sort(function(a,b){return b.freq-a.freq;});
+    var total = semSugestao.length;
+    for (var i = 0; i < total; i++) {
+        var c = semSugestao[i];
+        var cId = c.concurso||c.id||0;
+        var estAtual = rankingEstrategias[0] || ESTRATEGIAS[i % ESTRATEGIAS.length];
+        var seed = cId * 1000 + (i * 7);
+        var numeros = gerarPrevisaoPorEstrategia(sorted, estAtual.id || 'top6', seed);
+        historicoSugestoesIA.push({
+            id: Date.now() + i,
+            concursoId: cId,
+            numeros: numeros,
+            estrategia: estAtual.nome || 'Top 6',
+            acertos: calcularAcertos(numeros, c.numeros),
+            geracao: geracaoTreinamento,
+            timestamp: new Date().toISOString()
+        });
+        // Yield a cada 200 para não travar a UI
+        if (i % 200 === 0 && i > 0) {
+            if(badgeText) badgeText.textContent = 'IA: ' + i + '/' + total + ' concursos...';
+            await new Promise(function(r){setTimeout(r, 1);});
+        }
+    }
+    salvarSugestoesIA();
+    // Atualizar badge
+    if(badgeText) badgeText.textContent = 'IA Treinada G' + geracaoTreinamento;
+    if(badge) badge.className = 'ai-badge trained hidden md:flex';
+    // Atualizar tabela se a aba histórico estiver ativa
+    var tabHistorico = document.getElementById('tab-historico');
+    if(tabHistorico && tabHistorico.classList.contains('active')) {
+        renderizarTabelaHistorico();
+    }
+    showToast('✓ Sugestões geradas para todos os ' + historicoSugestoesIA.length + ' concursos!', 'success', 5000);
 }
 
 async function gerarSugestoesRetroativas() {
