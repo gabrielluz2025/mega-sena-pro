@@ -865,35 +865,48 @@ function calcularEstatisticas() {
 // CARREGAR CONHECIMENTO (Servidor + localStorage)
 // ============================================================
 async function carregarConhecimento() {
+    // Tentar carregar do servidor com timeout curto (para não travar no GitHub Pages)
     try {
-        const r = await fetch('/api/carregar-conhecimento');
-        const d = await r.json();
-        if (d.sucesso && d.conhecimento) {
-            conhecimentoEstrategias = d.conhecimento;
-            rankingEstrategias = d.conhecimento.ranking || [];
-            localStorage.setItem('megaSenaPro_conhecimento', JSON.stringify(d.conhecimento));
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 3000);
+        const r = await fetch('/api/carregar-conhecimento', { signal: controller.signal });
+        clearTimeout(timeout);
+        if (r.ok && r.headers.get('content-type')?.includes('application/json')) {
+            const d = await r.json();
+            if (d.sucesso && d.conhecimento) {
+                conhecimentoEstrategias = d.conhecimento;
+                rankingEstrategias = d.conhecimento.ranking || [];
+                localStorage.setItem('megaSenaPro_conhecimento', JSON.stringify(d.conhecimento));
+                atualizarStatusIA();
+                mostrarPreviewEstrategias();
+                return;
+            }
+        }
+    } catch(e) { /* Servidor não disponível (GitHub Pages ou offline) - usar localStorage */ }
+    // Fallback: carregar do localStorage
+    try {
+        const saved = localStorage.getItem('megaSenaPro_conhecimento');
+        if (saved) {
+            conhecimentoEstrategias = JSON.parse(saved);
+            rankingEstrategias = conhecimentoEstrategias.ranking || [];
             atualizarStatusIA();
             mostrarPreviewEstrategias();
-            return;
         }
-    } catch(e) {}
-    const saved = localStorage.getItem('megaSenaPro_conhecimento');
-    if (saved) {
-        conhecimentoEstrategias = JSON.parse(saved);
-        rankingEstrategias = conhecimentoEstrategias.ranking || [];
-        atualizarStatusIA();
-        mostrarPreviewEstrategias();
-    }
+    } catch(e) { conhecimentoEstrategias = {}; rankingEstrategias = []; }
 }
 
 async function salvarConhecimentoServidor() {
     if (!rankingEstrategias.length) return;
     try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 3000);
         await fetch('/api/salvar-conhecimento', {
             method:'POST', headers:{'Content-Type':'application/json'},
-            body: JSON.stringify({ conhecimento: conhecimentoEstrategias, historico: rankingEstrategias })
+            body: JSON.stringify({ conhecimento: conhecimentoEstrategias, historico: rankingEstrategias }),
+            signal: controller.signal
         });
-    } catch(e) {}
+        clearTimeout(timeout);
+    } catch(e) { /* Servidor não disponível - conhecimento salvo apenas no localStorage */ }
 }
 
 function salvarConhecimento() {
