@@ -624,20 +624,58 @@
 
         <!-- TAB: GLOBO -->
         <div id="tab-globo" class="tab-content fade-in">
-            <div class="flex items-center justify-between mb-5">
+            <div class="flex items-center justify-between mb-5 flex-wrap gap-3">
                 <h2 class="text-2xl font-bold gradient-text">🎰 Globo da Mega Sena</h2>
-                <div class="flex items-center gap-4 text-sm">
-                    <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-red-500 inline-block"></span><span class="text-slate-400">Quente</span></span>
-                    <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-blue-500 inline-block"></span><span class="text-slate-400">Frio</span></span>
-                    <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span><span class="text-slate-400">Neutro</span></span>
+                <div class="flex items-center gap-2">
+                    <button onclick="setGloboView('temperatura')" id="btnViewTemp" class="px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-xs font-medium transition">🌡️ Temperatura</button>
+                    <button onclick="setGloboView('posicao')" id="btnViewPos" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg text-xs font-medium transition">🎱 Por Posição</button>
                 </div>
             </div>
-            <div class="glass rounded-2xl p-6">
-                <div id="globeContainer" class="globe-grid"></div>
-                <div class="mt-6 grid grid-cols-3 gap-4">
-                    <div class="text-center p-3 bg-slate-800/50 rounded-xl"><div class="text-2xl font-bold text-red-400" id="globeHotCount">0</div><div class="text-xs text-slate-400">Quentes</div></div>
-                    <div class="text-center p-3 bg-slate-800/50 rounded-xl"><div class="text-2xl font-bold text-blue-400" id="globeColdCount">0</div><div class="text-xs text-slate-400">Frios</div></div>
-                    <div class="text-center p-3 bg-slate-800/50 rounded-xl"><div class="text-2xl font-bold text-amber-400" id="globeNeutralCount">0</div><div class="text-xs text-slate-400">Neutros</div></div>
+
+            <!-- VIEW: TEMPERATURA (padrão) -->
+            <div id="viewTemperatura">
+                <div class="glass rounded-2xl p-6">
+                    <div class="flex items-center gap-4 text-sm mb-4 flex-wrap">
+                        <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-red-500 inline-block"></span><span class="text-slate-400">Quente (top 30%)</span></span>
+                        <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-blue-500 inline-block"></span><span class="text-slate-400">Frio (bottom 30%)</span></span>
+                        <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span><span class="text-slate-400">Neutro</span></span>
+                    </div>
+                    <div id="globeContainer" class="globe-grid"></div>
+                    <div class="mt-6 grid grid-cols-3 gap-4">
+                        <div class="text-center p-3 bg-slate-800/50 rounded-xl"><div class="text-2xl font-bold text-red-400" id="globeHotCount">0</div><div class="text-xs text-slate-400">Quentes</div></div>
+                        <div class="text-center p-3 bg-slate-800/50 rounded-xl"><div class="text-2xl font-bold text-blue-400" id="globeColdCount">0</div><div class="text-xs text-slate-400">Frios</div></div>
+                        <div class="text-center p-3 bg-slate-800/50 rounded-xl"><div class="text-2xl font-bold text-amber-400" id="globeNeutralCount">0</div><div class="text-xs text-slate-400">Neutros</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: POR POSIÇÃO -->
+            <div id="viewPosicao" class="hidden">
+                <div class="glass rounded-2xl p-5 mb-4">
+                    <div class="flex items-center gap-2 mb-3">
+                        <i class="fas fa-info-circle text-indigo-400"></i>
+                        <p class="text-sm text-slate-300">Mostra qual número saiu mais vezes em cada posição do sorteio (1ª bola, 2ª bola... 6ª bola). Os números são ordenados do menor para o maior em cada sorteio.</p>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3" id="resumoPosicao">
+                        <!-- Preenchido via JS -->
+                    </div>
+                </div>
+                <!-- 6 Globos de posição -->
+                <div class="space-y-4" id="globosPosicao">
+                    <!-- Preenchido via JS -->
+                </div>
+                <!-- Sugestão baseada em posição -->
+                <div class="glass rounded-2xl p-5 mt-4">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-base font-bold flex items-center gap-2"><i class="fas fa-magic text-purple-400"></i>Sugestão por Posição</h3>
+                        <button onclick="gerarSugestaoPorPosicao()" class="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-xl transition text-sm flex items-center gap-2">
+                            <i class="fas fa-dice"></i>Gerar Sugestão
+                        </button>
+                    </div>
+                    <div id="sugestaoPosicaoNums" class="flex gap-3 flex-wrap justify-center py-3">
+                        <span class="text-slate-500 text-sm">Clique em "Gerar Sugestão" para ver a previsão baseada em posição</span>
+                    </div>
+                    <div id="sugestaoPosicaoInfo" class="text-xs text-slate-500 text-center mt-2"></div>
                 </div>
             </div>
         </div>
@@ -843,7 +881,10 @@ function showTab(name) {
     document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
     const el = document.getElementById('tab-' + name);
     if(el) { el.classList.add('active'); el.classList.remove('fade-in'); void el.offsetWidth; el.classList.add('fade-in'); }
-    if(name==='globo') renderGlobe();
+    if(name==='globo') {
+        if(globoViewAtual === 'posicao') renderGloboPosicao();
+        else renderGlobe();
+    }
     if(name==='historico') renderizarTabelaHistorico();
     if(name==='gestao') renderizarConcursosCustom();
     if(name==='placar') renderizarPlacar();
@@ -1130,6 +1171,32 @@ function renderCharts() {
 // ============================================================
 // GLOBO
 // ============================================================
+// ============================================================
+// GLOBO - CONTROLE DE VIEWS
+// ============================================================
+var globoViewAtual = 'temperatura';
+
+function setGloboView(view) {
+    globoViewAtual = view;
+    var btnTemp = document.getElementById('btnViewTemp');
+    var btnPos = document.getElementById('btnViewPos');
+    var vTemp = document.getElementById('viewTemperatura');
+    var vPos = document.getElementById('viewPosicao');
+    if(view === 'temperatura') {
+        btnTemp.className = 'px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-xs font-medium transition';
+        btnPos.className = 'px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg text-xs font-medium transition';
+        vTemp.classList.remove('hidden');
+        vPos.classList.add('hidden');
+        renderGlobe();
+    } else {
+        btnPos.className = 'px-3 py-1.5 bg-purple-600 text-white rounded-lg text-xs font-medium transition';
+        btnTemp.className = 'px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg text-xs font-medium transition';
+        vPos.classList.remove('hidden');
+        vTemp.classList.add('hidden');
+        renderGloboPosicao();
+    }
+}
+
 function renderGlobe() {
     var c = document.getElementById('globeContainer');
     if (!c || c.children.length > 0) return;
@@ -1148,6 +1215,158 @@ function renderGlobe() {
     document.getElementById('globeHotCount').textContent = hot;
     document.getElementById('globeColdCount').textContent = cold;
     document.getElementById('globeNeutralCount').textContent = neutral;
+}
+
+// ============================================================
+// GLOBO POR POSIÇÃO
+// ============================================================
+var cachePosicaoFreq = null;
+
+function calcularFrequenciaPorPosicao() {
+    if (cachePosicaoFreq) return cachePosicaoFreq;
+    // posFreq[pos][numero] = quantidade de vezes que o numero saiu na posicao pos
+    var posFreq = [];
+    for(var p=0; p<6; p++) {
+        var mapa = {};
+        for(var n=1; n<=60; n++) mapa[n] = 0;
+        posFreq.push(mapa);
+    }
+    historicoSorteios.forEach(function(c) {
+        var nums = c.numeros.slice().sort(function(a,b){return a-b;});
+        nums.forEach(function(n, pos) {
+            if(pos < 6) posFreq[pos][n]++;
+        });
+    });
+    cachePosicaoFreq = posFreq;
+    return posFreq;
+}
+
+function renderGloboPosicao() {
+    var posFreq = calcularFrequenciaPorPosicao();
+    var total = historicoSorteios.length;
+    var nomes = ['1ª Bola (menor)', '2ª Bola', '3ª Bola', '4ª Bola', '5ª Bola', '6ª Bola (maior)'];
+    var cores = [
+        { bg:'#6366f1', light:'rgba(99,102,241,0.15)', border:'#6366f1' },
+        { bg:'#8b5cf6', light:'rgba(139,92,246,0.15)', border:'#8b5cf6' },
+        { bg:'#ec4899', light:'rgba(236,72,153,0.15)', border:'#ec4899' },
+        { bg:'#f97316', light:'rgba(249,115,22,0.15)', border:'#f97316' },
+        { bg:'#10b981', light:'rgba(16,185,129,0.15)', border:'#10b981' },
+        { bg:'#fbbf24', light:'rgba(251,191,36,0.15)', border:'#fbbf24' }
+    ];
+
+    // Resumo: numero mais frequente por posicao
+    var resumoEl = document.getElementById('resumoPosicao');
+    resumoEl.innerHTML = nomes.map(function(nome, pos) {
+        var sorted = Object.entries(posFreq[pos]).sort(function(a,b){return b[1]-a[1];});
+        var top = sorted[0];
+        var pct = total > 0 ? ((top[1]/total)*100).toFixed(1) : 0;
+        var cor = cores[pos];
+        return '<div class="p-3 rounded-xl border text-center" style="background:' + cor.light + ';border-color:' + cor.border + '40">' +
+            '<div class="text-xs text-slate-400 mb-1">' + nome + '</div>' +
+            '<div class="text-3xl font-bold" style="color:' + cor.bg + '">' + String(top[0]).padStart(2,'0') + '</div>' +
+            '<div class="text-xs text-slate-300 mt-1">' + top[1] + 'x (' + pct + '%)</div>' +
+            '</div>';
+    }).join('');
+
+    // 6 Globos detalhados
+    var globosEl = document.getElementById('globosPosicao');
+    globosEl.innerHTML = nomes.map(function(nome, pos) {
+        var sorted = Object.entries(posFreq[pos]).sort(function(a,b){return b[1]-a[1];});
+        var maxFreq = sorted[0][1];
+        var cor = cores[pos];
+        // Top 10 para exibir com barra
+        var top10 = sorted.slice(0, 10);
+        // Grade com todos os 60 numeros coloridos por intensidade
+        var grade = '';
+        for(var n=1; n<=60; n++) {
+            var freq = posFreq[pos][n] || 0;
+            var intensidade = maxFreq > 0 ? freq / maxFreq : 0;
+            var alpha = 0.1 + intensidade * 0.85;
+            var tamanho = intensidade >= 0.7 ? 'font-bold text-sm' : intensidade >= 0.4 ? 'font-medium text-xs' : 'text-xs';
+            var bgColor = 'rgba(' + hexToRgb(cor.bg) + ',' + alpha.toFixed(2) + ')';
+            var textColor = intensidade >= 0.5 ? '#fff' : '#94a3b8';
+            grade += '<div onclick="showPosicaoDetail(' + pos + ',' + n + ')" ' +
+                'title="Número ' + n + ': ' + freq + ' vezes na ' + (pos+1) + 'ª posição" ' +
+                'class="globe-number cursor-pointer transition-transform hover:scale-110 ' + tamanho + '" ' +
+                'style="background:' + bgColor + ';color:' + textColor + ';border:1px solid rgba(' + hexToRgb(cor.bg) + ',0.3)">' +
+                String(n).padStart(2,'0') + '</div>';
+        }
+        return '<div class="glass rounded-2xl p-5">' +
+            '<div class="flex items-center justify-between mb-4">' +
+            '<h3 class="text-base font-bold flex items-center gap-2">' +
+            '<span class="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold" style="background:' + cor.bg + '">' + (pos+1) + '</span>' +
+            nome + '</h3>' +
+            '<div class="text-right">' +
+            '<div class="text-xs text-slate-400">Número mais frequente</div>' +
+            '<div class="text-lg font-bold" style="color:' + cor.bg + '">' + String(sorted[0][0]).padStart(2,'0') + ' <span class="text-sm text-slate-400">(' + sorted[0][1] + 'x)</span></div>' +
+            '</div></div>' +
+            '<!-- Grade de todos os 60 numeros -->' +
+            '<div class="globe-grid mb-4">' + grade + '</div>' +
+            '<!-- Top 10 com barra de progresso -->' +
+            '<div class="mt-3">' +
+            '<div class="text-xs text-slate-400 mb-2 font-medium">Top 10 mais frequentes nesta posição:</div>' +
+            '<div class="space-y-1.5">' +
+            top10.map(function(entry, rank) {
+                var pct = maxFreq > 0 ? (entry[1]/maxFreq*100).toFixed(0) : 0;
+                var pctTotal = total > 0 ? (entry[1]/total*100).toFixed(1) : 0;
+                return '<div class="flex items-center gap-2">' +
+                    '<span class="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0" style="background:' + cor.bg + ';opacity:' + (1-rank*0.08) + '">' + String(entry[0]).padStart(2,'0') + '</span>' +
+                    '<div class="flex-1 bg-slate-800 rounded-full h-4 overflow-hidden">' +
+                    '<div class="h-full rounded-full flex items-center pl-2" style="width:' + pct + '%;background:linear-gradient(90deg,' + cor.bg + ',' + cor.bg + '99);min-width:24px">' +
+                    '<span class="text-white text-xs font-bold">' + entry[1] + '</span></div></div>' +
+                    '<span class="text-xs text-slate-400 w-12 text-right">' + pctTotal + '%</span>' +
+                    '</div>';
+            }).join('') +
+            '</div></div></div>';
+    }).join('');
+}
+
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? parseInt(result[1],16) + ',' + parseInt(result[2],16) + ',' + parseInt(result[3],16) : '99,102,241';
+}
+
+function showPosicaoDetail(pos, num) {
+    var posFreq = calcularFrequenciaPorPosicao();
+    var freq = posFreq[pos][num] || 0;
+    var total = historicoSorteios.length;
+    var pct = total > 0 ? ((freq/total)*100).toFixed(2) : 0;
+    var sorted = Object.entries(posFreq[pos]).sort(function(a,b){return b[1]-a[1];});
+    var rank = sorted.findIndex(function(e){return parseInt(e[0])===num;}) + 1;
+    var nomes = ['1ª','2ª','3ª','4ª','5ª','6ª'];
+    showToast('Número ' + num + ' na ' + nomes[pos] + ' posição: ' + freq + 'x (' + pct + '%) — Rank #' + rank + ' de 60', 'info', 5000);
+}
+
+function gerarSugestaoPorPosicao() {
+    var posFreq = calcularFrequenciaPorPosicao();
+    var result = [];
+    var usados = new Set();
+    // Para cada posicao, pegar o numero mais frequente nao usado
+    for(var pos=0; pos<6; pos++) {
+        var sorted = Object.entries(posFreq[pos])
+            .filter(function(e){return !usados.has(parseInt(e[0]));}) 
+            .sort(function(a,b){return b[1]-a[1];});
+        if(sorted.length > 0) {
+            var num = parseInt(sorted[0][0]);
+            result.push(num);
+            usados.add(num);
+        }
+    }
+    result.sort(function(a,b){return a-b;});
+    var cores = ['#6366f1','#8b5cf6','#ec4899','#f97316','#10b981','#fbbf24'];
+    var el = document.getElementById('sugestaoPosicaoNums');
+    el.innerHTML = result.map(function(n, idx) {
+        return '<div class="flex flex-col items-center gap-1">' +
+            '<span class="text-xs text-slate-400">' + (idx+1) + 'ª bola</span>' +
+            '<div class="w-14 h-14 rounded-full flex items-center justify-center text-white text-lg font-bold shadow-lg" style="background:linear-gradient(135deg,' + cores[idx] + ',' + cores[idx] + 'cc)">' + String(n).padStart(2,'0') + '</div>' +
+            '</div>';
+    }).join('');
+    // Calcular acertos historicos desta sugestao
+    var acertosTotal = 0;
+    historicoSorteios.forEach(function(c) { acertosTotal += calcularAcertos(result, c.numeros); });
+    var media = (acertosTotal / historicoSorteios.length).toFixed(2);
+    document.getElementById('sugestaoPosicaoInfo').innerHTML = 'ℹ️ Média histórica desta sugestão: <strong class="text-purple-400">' + media + ' acertos/jogo</strong> em ' + historicoSorteios.length + ' sorteios analisados';
+    showToast('Sugestão por posição: ' + result.join(', '), 'success');
 }
 
 function getNumberTemperature(n) {
@@ -1318,12 +1537,14 @@ function gerarPorClusters(sorted, seed) {
 }
 
 function gerarPorPosicao(sorted, seed) {
-    var posFreq=Array(6).fill(null).map(function(){return new Map();});
-    historicoSorteios.forEach(function(c){c.numeros.forEach(function(n,pos){posFreq[pos].set(n,(posFreq[pos].get(n)||0)+1);});});
+    // Usa o cache centralizado de frequencia por posicao
+    var posFreq = calcularFrequenciaPorPosicao();
     var result=[]; var usados=new Set();
     for(var pos=0;pos<6;pos++){
-        var cands=Array.from(posFreq[pos].entries()).filter(function(e){return !usados.has(e[0]);}).sort(function(a,b){return b[1]-a[1];});
-        if(cands.length>0){result.push(cands[0][0]);usados.add(cands[0][0]);}
+        var cands = Object.entries(posFreq[pos])
+            .filter(function(e){return !usados.has(parseInt(e[0]));}) 
+            .sort(function(a,b){return b[1]-a[1];});
+        if(cands.length>0){var num=parseInt(cands[0][0]);result.push(num);usados.add(num);}
     }
     while(result.length<6){var n=sorted.find(function(x){return !usados.has(x.numero);});if(!n)break;result.push(n.numero);usados.add(n.numero);}
     return result.sort(function(a,b){return a-b;});
@@ -1378,6 +1599,7 @@ async function salvarNovoResultadoAutomatico() {
 
     // 2. Recalcular estatísticas
     calcularEstatisticas();
+    cachePosicaoFreq = null; // Invalidar cache de posicao
 
     // 3. Comparar com sugestões da IA
     var comparacoes = historicoSugestoesProximo.map(function(sug){return Object.assign({},sug,{acertos:calcularAcertos(sug.numeros,numeros)});}).sort(function(a,b){return b.acertos-a.acertos;});
