@@ -1669,8 +1669,24 @@ function gerarSugestaoProximoJogo() {
         var numeros = gerarPrevisaoPorEstrategia(sorted, est.id, seedEst);
         var pesoAprendido = (conhecimentoEstrategias.pesosAprendidos && conhecimentoEstrategias.pesosAprendidos[est.id]) || 1.0;
         var mediaHistorica = (resultadosPorEstrategia[est.id] && resultadosPorEstrategia[est.id].mediaAcertos) || 2.0;
-        var score = parseFloat(mediaHistorica) * pesoAprendido + (Math.random()*0.1);
-        return { estrategia:est.nome, estrategiaId:est.id, numeros:numeros, confianca:Math.min(95,Math.round((score/6)*100)), mediaHistorica:score, timestamp:timestamp.toISOString(), proximoConcurso:proximoConcurso, geracao:geracaoTreinamento };
+        // A confiança agora considera o peso aprendido (treinamento) como fator de estabilidade
+        var bonusGeracao = Math.min(1.5, geracaoTreinamento * 0.05); 
+        var score = (parseFloat(mediaHistorica) * pesoAprendido) + bonusGeracao;
+        score += (Math.random() * 0.05);
+
+        var confCalculada = Math.round((score / 7.5) * 100);
+        var confiancaFinal = Math.min(98, Math.max(65 + (geracaoTreinamento > 10 ? 10 : geracaoTreinamento), confCalculada));
+
+        return { 
+            estrategia: est.nome, 
+            estrategiaId: est.id, 
+            numeros: numeros, 
+            confianca: confiancaFinal, 
+            mediaHistorica: score, 
+            timestamp: timestamp.toISOString(), 
+            proximoConcurso: proximoConcurso, 
+            geracao: geracaoTreinamento 
+        };
     });
 
     sugestoesPorEstrategia.sort(function(a,b){return b.mediaHistorica-a.mediaHistorica;});
