@@ -1,0 +1,1954 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <title>🎰 Mega Sena PRO v3 - Sistema Unificado de Inteligência</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --bg-elevated: #475569;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+            --accent-amber: #fbbf24;
+            --accent-emerald: #10b981;
+            --accent-indigo: #6366f1;
+            --accent-purple: #8b5cf6;
+            --accent-rose: #f43f5e;
+            --accent-blue: #3b82f6;
+            --accent-pink: #ec4899;
+            --glass-bg: rgba(30, 41, 59, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+        [data-theme="light"] {
+            --bg-primary: #f1f5f9;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #e2e8f0;
+            --bg-elevated: #cbd5e1;
+            --text-primary: #0f172a;
+            --text-secondary: #334155;
+            --text-muted: #64748b;
+            --glass-bg: rgba(255,255,255,0.92);
+            --glass-border: rgba(0,0,0,0.08);
+        }
+        * { font-family: 'Inter', sans-serif; transition: background-color 0.3s, color 0.3s; }
+        body { background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        .glass { background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--glass-border); }
+        .gradient-text { background: linear-gradient(135deg, #fbbf24, #f59e0b, #f43f5e); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+        .gradient-text-blue { background: linear-gradient(135deg, #6366f1, #8b5cf6); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+        .gradient-text-green { background: linear-gradient(135deg, #10b981, #059669); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+
+        /* Number Ball */
+        .number-ball {
+            width: 48px; height: 48px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 1rem; cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+            position: relative; overflow: hidden;
+        }
+        .number-ball::before { content:''; position:absolute; top:2px; left:50%; transform:translateX(-50%); width:60%; height:30%; background:rgba(255,255,255,0.3); border-radius:50%; }
+        .number-ball:hover { transform: scale(1.15) rotate(10deg); box-shadow: 0 0 30px rgba(251,191,36,0.6); }
+        .number-ball.hot { background: linear-gradient(135deg,#ef4444,#dc2626); color:white; box-shadow:0 4px 15px rgba(239,68,68,0.4); }
+        .number-ball.cold { background: linear-gradient(135deg,#3b82f6,#2563eb); color:white; box-shadow:0 4px 15px rgba(59,130,246,0.4); }
+        .number-ball.neutral { background: linear-gradient(135deg,#fbbf24,#f59e0b); color:#1e293b; box-shadow:0 4px 15px rgba(251,191,36,0.4); }
+        .number-ball.selected { background: linear-gradient(135deg,#10b981,#059669); color:white; box-shadow:0 0 25px rgba(16,185,129,0.6); animation: pulse-glow 2s infinite; }
+        .number-ball.ia { background: linear-gradient(135deg,#8b5cf6,#6366f1); color:white; box-shadow:0 4px 15px rgba(139,92,246,0.5); }
+        @keyframes pulse-glow { 0%,100%{box-shadow:0 0 20px rgba(16,185,129,0.6);} 50%{box-shadow:0 0 35px rgba(16,185,129,0.8);} }
+
+        /* Globe */
+        .globe-grid { display:grid; grid-template-columns:repeat(10,1fr); gap:8px; max-width:600px; margin:0 auto; }
+        .globe-number { aspect-ratio:1; display:flex; align-items:center; justify-content:center; border-radius:50%; font-weight:600; font-size:0.85rem; cursor:pointer; transition:all 0.3s; position:relative; }
+        .globe-number:hover { transform:scale(1.2); z-index:10; }
+
+        /* Cards */
+        .stat-card { background:var(--bg-secondary); border-radius:16px; padding:1.5rem; transition:all 0.3s; border:1px solid var(--glass-border); position:relative; overflow:hidden; }
+        .stat-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--accent-amber),var(--accent-emerald),var(--accent-indigo)); }
+        .stat-card:hover { transform:translateY(-4px); box-shadow:0 20px 40px rgba(0,0,0,0.3); }
+
+        /* Tabs */
+        .tab-nav { display:flex; gap:2px; background:var(--bg-tertiary); padding:4px; border-radius:14px; flex-wrap:wrap; }
+        .tab-btn { padding:9px 16px; border-radius:10px; font-weight:500; font-size:0.82rem; transition:all 0.3s; cursor:pointer; border:none; background:transparent; color:var(--text-secondary); display:flex; align-items:center; gap:6px; white-space:nowrap; }
+        .tab-btn:hover { background:var(--bg-elevated); color:var(--text-primary); }
+        .tab-btn.active { background:var(--accent-indigo); color:white; box-shadow:0 4px 15px rgba(99,102,241,0.4); }
+        .tab-content { display:none; }
+        .tab-content.active { display:block; }
+
+        /* Progress */
+        .progress-bar-track { background:var(--bg-tertiary); border-radius:9999px; height:8px; overflow:hidden; }
+        .progress-bar-fill { height:100%; border-radius:9999px; background:linear-gradient(90deg,var(--accent-emerald),var(--accent-amber)); transition:width 0.5s ease; }
+
+        /* Toast */
+        .toast-container { position:fixed; top:20px; right:20px; z-index:9999; display:flex; flex-direction:column; gap:10px; }
+        .toast { background:var(--bg-secondary); border:1px solid var(--glass-border); border-radius:12px; padding:14px 18px; min-width:280px; max-width:380px; box-shadow:0 10px 40px rgba(0,0,0,0.3); display:flex; align-items:center; gap:12px; animation:slide-in 0.3s ease; }
+        .toast.success { border-left:4px solid var(--accent-emerald); }
+        .toast.error { border-left:4px solid var(--accent-rose); }
+        .toast.warning { border-left:4px solid var(--accent-amber); }
+        .toast.info { border-left:4px solid var(--accent-blue); }
+        @keyframes slide-in { from{transform:translateX(100%);opacity:0;} to{transform:translateX(0);opacity:1;} }
+
+        /* Modal */
+        .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.75); backdrop-filter:blur(5px); display:flex; align-items:center; justify-content:center; z-index:9998; opacity:0; visibility:hidden; transition:all 0.3s; }
+        .modal-overlay.active { opacity:1; visibility:visible; }
+        .modal-content { background:var(--bg-secondary); border-radius:20px; padding:24px; max-width:640px; width:92%; max-height:85vh; overflow-y:auto; transform:scale(0.9); transition:all 0.3s; border:1px solid var(--glass-border); }
+        .modal-overlay.active .modal-content { transform:scale(1); }
+
+        /* Strategy Cards */
+        .strategy-card { background:var(--bg-secondary); border-radius:12px; padding:14px; border:1px solid var(--glass-border); transition:all 0.3s; cursor:pointer; }
+        .strategy-card:hover { border-color:var(--accent-indigo); transform:translateX(4px); }
+        .strategy-card.rank-1 { border-left:4px solid #ffd700; }
+        .strategy-card.rank-2 { border-left:4px solid #c0c0c0; }
+        .strategy-card.rank-3 { border-left:4px solid #cd7f32; }
+
+        /* Theme Toggle */
+        .theme-toggle { width:50px; height:26px; background:var(--bg-tertiary); border-radius:13px; position:relative; cursor:pointer; transition:all 0.3s; }
+        .theme-toggle::after { content:'🌙'; position:absolute; top:2px; left:2px; width:22px; height:22px; background:var(--accent-amber); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; transition:all 0.3s; }
+        [data-theme="light"] .theme-toggle::after { content:'☀️'; left:calc(100% - 24px); }
+
+        /* Animations */
+        .fade-in { animation:fadeIn 0.4s ease; }
+        @keyframes fadeIn { from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:translateY(0);} }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width:6px; height:6px; }
+        ::-webkit-scrollbar-track { background:var(--bg-secondary); }
+        ::-webkit-scrollbar-thumb { background:var(--bg-elevated); border-radius:3px; }
+
+        /* AI Learning Badge */
+        .ai-badge { display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:20px; font-size:0.75rem; font-weight:600; }
+        .ai-badge.learning { background:rgba(99,102,241,0.2); color:#818cf8; border:1px solid rgba(99,102,241,0.3); }
+        .ai-badge.trained { background:rgba(16,185,129,0.2); color:#34d399; border:1px solid rgba(16,185,129,0.3); }
+        .ai-badge.idle { background:rgba(100,116,139,0.2); color:#94a3b8; border:1px solid rgba(100,116,139,0.3); }
+
+        /* Acertos badge */
+        .acertos-badge { padding:3px 8px; border-radius:6px; font-size:0.72rem; font-weight:700; }
+        .acertos-0, .acertos-1 { background:rgba(100,116,139,0.2); color:#94a3b8; }
+        .acertos-2, .acertos-3 { background:rgba(251,191,36,0.2); color:#fbbf24; }
+        .acertos-4 { background:rgba(59,130,246,0.2); color:#60a5fa; }
+        .acertos-5 { background:rgba(139,92,246,0.2); color:#a78bfa; }
+        .acertos-6 { background:rgba(16,185,129,0.2); color:#34d399; animation:pulse-glow 1s infinite; }
+
+        /* Responsive */
+        @media (max-width:768px) {
+            .globe-grid { grid-template-columns:repeat(6,1fr); gap:5px; }
+            .tab-btn { padding:7px 10px; font-size:0.75rem; }
+            .tab-btn span { display:none; }
+            .stat-card { padding:1rem; }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+<!-- Toast Container -->
+<div id="toastContainer" class="toast-container"></div>
+
+<!-- ===== HEADER ===== -->
+<header class="glass sticky top-0 z-50 border-b border-white/10">
+    <div class="container mx-auto px-4 py-3">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="text-3xl animate-bounce">🎰</div>
+                <div>
+                    <h1 class="text-xl font-bold gradient-text">Mega Sena PRO</h1>
+                    <p class="text-xs text-slate-400">v3.0 • Sistema Unificado de Inteligência</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <!-- AI Status -->
+                <div id="headerAiStatus" class="ai-badge idle hidden md:flex">
+                    <i class="fas fa-robot text-xs"></i>
+                    <span id="headerAiText">IA Aguardando</span>
+                </div>
+                <!-- Stats -->
+                <div class="hidden md:flex items-center gap-2 bg-slate-800/50 px-3 py-1.5 rounded-xl border border-white/10">
+                    <i class="fas fa-database text-emerald-400 text-xs"></i>
+                    <span class="text-sm font-medium"><span id="totalSorteiosHeader">-</span> sorteios</span>
+                </div>
+                <!-- Próximo Concurso Badge -->
+                <div class="hidden md:flex items-center gap-2 bg-pink-500/10 px-3 py-1.5 rounded-xl border border-pink-500/30">
+                    <i class="fas fa-star text-pink-400 text-xs animate-pulse"></i>
+                    <span class="text-sm font-medium text-pink-300">Próximo: #<span id="headerProximoConcurso">-</span></span>
+                </div>
+                <!-- Theme -->
+                <div class="theme-toggle" onclick="toggleTheme()"></div>
+                <!-- Help -->
+                <button onclick="showHelp()" class="bg-slate-800/50 hover:bg-slate-700 p-2 rounded-xl border border-white/10 transition">
+                    <i class="fas fa-keyboard text-slate-400 text-sm"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="container mx-auto px-4 py-5">
+
+    <!-- ===== TAB NAVIGATION ===== -->
+    <div class="flex justify-center mb-6">
+        <div class="tab-nav">
+            <button class="tab-btn active" onclick="showTab('dashboard')" data-tab="dashboard">
+                <i class="fas fa-chart-line"></i><span>Dashboard</span>
+            </button>
+            <button class="tab-btn" onclick="showTab('proximo')" data-tab="proximo">
+                <i class="fas fa-crown text-pink-400"></i><span>Próximo Jogo</span>
+            </button>
+            <button class="tab-btn" onclick="showTab('historico')" data-tab="historico">
+                <i class="fas fa-history"></i><span>Histórico IA</span>
+            </button>
+            <button class="tab-btn" onclick="showTab('treinamento')" data-tab="treinamento">
+                <i class="fas fa-brain"></i><span>Treinamento IA</span>
+            </button>
+            <button class="tab-btn" onclick="showTab('globo')" data-tab="globo">
+                <i class="fas fa-globe"></i><span>Globo</span>
+            </button>
+            <button class="tab-btn" onclick="showTab('simulador')" data-tab="simulador">
+                <i class="fas fa-calculator"></i><span>Simulador</span>
+            </button>
+            <button class="tab-btn" onclick="showTab('gestao')" data-tab="gestao">
+                <i class="fas fa-cog"></i><span>Gestão</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Loading -->
+    <div id="loading" class="flex flex-col items-center justify-center py-20">
+        <div class="relative">
+            <div class="animate-spin rounded-full h-20 w-20 border-4 border-slate-700 border-t-amber-500"></div>
+            <div class="absolute inset-0 flex items-center justify-center"><span class="text-2xl">🎰</span></div>
+        </div>
+        <p class="text-slate-400 mt-6 text-lg">Carregando e processando dados...</p>
+        <p class="text-sm text-slate-500 mt-2">Processando <span class="font-mono text-amber-400">3001+</span> sorteios históricos</p>
+    </div>
+
+    <!-- Main Content -->
+    <div id="content" class="hidden">
+
+        <!-- ===== TAB: DASHBOARD ===== -->
+        <div id="tab-dashboard" class="tab-content active fade-in">
+            <div class="flex items-center justify-between mb-5">
+                <h2 class="text-2xl font-bold gradient-text">📊 Dashboard Executivo</h2>
+                <span class="text-xs text-slate-400" id="lastUpdate">Atualizado agora</span>
+            </div>
+
+            <!-- KPI Cards -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div class="stat-card cursor-pointer" onclick="showNumberDetail(getHottestNumber())">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center text-white"><i class="fas fa-fire"></i></div>
+                        <span class="text-xs text-slate-400 bg-slate-800 px-2 py-0.5 rounded">Quente</span>
+                    </div>
+                    <div class="text-3xl font-bold text-red-400 font-mono" id="kpiMaisFrequente">-</div>
+                    <div class="text-xs text-slate-400 mt-1">Mais Sorteado</div>
+                    <div class="text-xs text-slate-500 mt-1" id="kpiFreqCount">0 vezes</div>
+                </div>
+                <div class="stat-card cursor-pointer" onclick="showNumberDetail(getColdestNumber())">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white"><i class="fas fa-snowflake"></i></div>
+                        <span class="text-xs text-slate-400 bg-slate-800 px-2 py-0.5 rounded">Frio</span>
+                    </div>
+                    <div class="text-3xl font-bold text-blue-400 font-mono" id="kpiMaisAtrasado">-</div>
+                    <div class="text-xs text-slate-400 mt-1">Mais Atrasado</div>
+                    <div class="text-xs text-slate-500 mt-1" id="kpiAtrasoCount">0 concursos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center text-white"><i class="fas fa-calculator"></i></div>
+                        <span class="text-xs text-slate-400 bg-slate-800 px-2 py-0.5 rounded">Média</span>
+                    </div>
+                    <div class="text-3xl font-bold text-emerald-400 font-mono" id="kpiSomaMedia">186</div>
+                    <div class="text-xs text-slate-400 mt-1">Soma Média</div>
+                    <div class="text-xs text-slate-500 mt-1">Base histórica</div>
+                </div>
+                <div class="stat-card">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center text-white"><i class="fas fa-trophy"></i></div>
+                        <span class="text-xs text-slate-400 bg-slate-800 px-2 py-0.5 rounded">Total</span>
+                    </div>
+                    <div class="text-3xl font-bold text-purple-400 font-mono" id="kpiTotalSorteios">-</div>
+                    <div class="text-xs text-slate-400 mt-1">Sorteios</div>
+                    <div class="text-xs text-slate-500 mt-1">Desde 1996</div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
+                <div class="glass rounded-2xl p-5">
+                    <h3 class="text-base font-bold mb-3 flex items-center gap-2"><i class="fas fa-chart-bar text-amber-500"></i>Frequência (Top 20)</h3>
+                    <div style="height:280px;"><canvas id="chartFrequencia"></canvas></div>
+                </div>
+                <div class="glass rounded-2xl p-5">
+                    <h3 class="text-base font-bold mb-3 flex items-center gap-2"><i class="fas fa-chart-pie text-emerald-500"></i>Distribuição por Dezenas</h3>
+                    <div style="height:280px;"><canvas id="chartDezenas"></canvas></div>
+                </div>
+            </div>
+            <div class="glass rounded-2xl p-5">
+                <h3 class="text-base font-bold mb-3 flex items-center gap-2"><i class="fas fa-chart-line text-blue-500"></i>Tendências - Últimos 100 Sorteios</h3>
+                <div style="height:220px;"><canvas id="chartTendencias"></canvas></div>
+            </div>
+        </div>
+
+        <!-- ===== TAB: PRÓXIMO JOGO ===== -->
+        <div id="tab-proximo" class="tab-content fade-in">
+            <div class="flex items-center justify-between mb-5">
+                <h2 class="text-2xl font-bold" style="background:linear-gradient(135deg,#ec4899,#8b5cf6);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">
+                    👑 Sugestão para o Próximo Jogo
+                </h2>
+                <div class="flex items-center gap-2">
+                    <button onclick="toggleAutoSugestao()" id="btnAutoSugestao" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl transition flex items-center gap-2 text-sm">
+                        <i class="fas fa-play" id="iconAutoSugestao"></i><span id="textAutoSugestao">Auto: OFF</span>
+                    </button>
+                    <button onclick="gerarSugestaoProximoJogo()" class="px-4 py-2 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white rounded-xl transition flex items-center gap-2 text-sm">
+                        <i class="fas fa-sync"></i><span>Atualizar</span>
+                    </button>
+                    <button onclick="inputarResultadoOficial()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl transition flex items-center gap-2 text-sm">
+                        <i class="fas fa-plus-circle"></i><span>Inputar Resultado</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Sugestão Principal -->
+            <div class="glass rounded-2xl p-6 mb-5 border-2 border-pink-500/30 bg-gradient-to-br from-pink-500/5 to-purple-500/5">
+                <div class="text-center mb-5">
+                    <div class="inline-flex items-center gap-2 bg-pink-500/20 px-4 py-1.5 rounded-full text-pink-300 text-sm mb-3">
+                        <i class="fas fa-star animate-pulse"></i>
+                        <span>Concurso #<span id="proximoConcursoNum">-</span> • IA Treinada</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">Números Mais Cotados</h3>
+                    <div class="flex justify-center gap-3 flex-wrap" id="numerosSugestaoAtual">
+                        <span class="text-slate-500">Clique em "Atualizar" para gerar</span>
+                    </div>
+                </div>
+                <div class="grid grid-cols-3 gap-3 mt-4">
+                    <div class="bg-slate-800/50 rounded-xl p-3 text-center">
+                        <div class="text-xs text-slate-400 mb-1">Estratégia</div>
+                        <div class="font-semibold text-pink-300 text-sm" id="estrategiaSugestao">-</div>
+                    </div>
+                    <div class="bg-slate-800/50 rounded-xl p-3 text-center">
+                        <div class="text-xs text-slate-400 mb-1">Confiança</div>
+                        <div class="font-semibold text-emerald-400" id="confiancaSugestao">-</div>
+                    </div>
+                    <div class="bg-slate-800/50 rounded-xl p-3 text-center">
+                        <div class="text-xs text-slate-400 mb-1">Geração IA</div>
+                        <div class="font-semibold text-purple-400 font-mono" id="geracaoSugestao">-</div>
+                    </div>
+                </div>
+                <div class="text-center mt-3 text-xs text-slate-500" id="ultimaAtualizacaoSugestao">Última atualização: -</div>
+            </div>
+
+            <!-- Análise Pós-Resultado -->
+            <div id="painelAnaliseResultado" class="hidden glass rounded-2xl p-5 mb-5 border border-emerald-500/30">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-base font-bold flex items-center gap-2"><i class="fas fa-chart-bar text-emerald-500"></i>Análise: Sugestões vs Resultado Oficial</h3>
+                    <button onclick="aprenderComResultado()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl transition flex items-center gap-2 text-sm">
+                        <i class="fas fa-brain"></i><span>IA Aprender</span>
+                    </button>
+                </div>
+                <div id="resultadoComparacao" class="space-y-2"></div>
+                <div id="melhorSugestaoHistorico" class="mt-3 p-3 bg-emerald-500/10 rounded-xl border border-emerald-500/30"></div>
+            </div>
+
+            <!-- Histórico de Sugestões -->
+            <div class="glass rounded-2xl p-5">
+                <h3 class="text-base font-bold mb-3 flex items-center gap-2"><i class="fas fa-history text-blue-500"></i>Histórico de Sugestões Geradas</h3>
+                <div id="historicoSugestoesProximo" class="space-y-2 max-h-72 overflow-y-auto">
+                    <div class="text-center text-slate-500 text-sm py-4">Nenhuma sugestão gerada ainda</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== TAB: HISTÓRICO IA ===== -->
+        <div id="tab-historico" class="tab-content fade-in">
+            <div class="flex items-center justify-between mb-5">
+                <h2 class="text-2xl font-bold gradient-text-blue">🔬 Histórico de Concursos com IA</h2>
+                <div class="flex items-center gap-2">
+                    <div id="statusGeracaoRetroativa" class="hidden ai-badge learning">
+                        <i class="fas fa-robot animate-spin text-xs"></i>
+                        <span id="textoGeracaoRetroativa">Gerando sugestões...</span>
+                    </div>
+                    <button onclick="gerarSugestoesRetroativas()" id="btnGerarRetroativas" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl transition flex items-center gap-2 text-sm">
+                        <i class="fas fa-magic"></i><span>Gerar Sugestões p/ Todos</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats do Histórico -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-5">
+                <div class="stat-card border-l-4 border-emerald-500">
+                    <p class="text-slate-400 text-xs">Total Concursos</p>
+                    <p class="text-2xl font-bold font-mono" id="totalConcursosHistorico">0</p>
+                </div>
+                <div class="stat-card border-l-4 border-amber-500">
+                    <p class="text-slate-400 text-xs">Com Sugestão IA</p>
+                    <p class="text-2xl font-bold font-mono text-amber-400" id="totalComSugestao">0</p>
+                </div>
+                <div class="stat-card border-l-4 border-blue-500">
+                    <p class="text-slate-400 text-xs">Média de Acertos</p>
+                    <p class="text-2xl font-bold font-mono text-blue-400" id="mediaAcertosHistorico">0.0</p>
+                </div>
+                <div class="stat-card border-l-4 border-purple-500">
+                    <p class="text-slate-400 text-xs">Melhor Acerto</p>
+                    <p class="text-2xl font-bold font-mono text-purple-400" id="melhorAcertoHistorico">0</p>
+                </div>
+            </div>
+
+            <!-- Barra de Progresso Geração Retroativa -->
+            <div id="progressoRetroativo" class="hidden glass rounded-2xl p-4 mb-4">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm text-slate-400" id="textoProgressoRetroativo">Processando...</span>
+                    <span class="text-sm font-mono text-indigo-400" id="percentualRetroativo">0%</span>
+                </div>
+                <div class="progress-bar-track">
+                    <div id="barraRetroativa" class="progress-bar-fill" style="width:0%"></div>
+                </div>
+            </div>
+
+            <!-- Filtros -->
+            <div class="glass rounded-2xl p-4 mb-4 flex flex-wrap items-center gap-3">
+                <input type="text" id="buscaHistorico" placeholder="Buscar concurso..." 
+                    class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-white focus:border-indigo-500 focus:outline-none flex-1 min-w-32"
+                    onkeyup="filtrarHistorico()">
+                <select id="filtroHistorico" onchange="filtrarHistorico()" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-white">
+                    <option value="todos">Todos</option>
+                    <option value="com-sugestao">Com Sugestão</option>
+                    <option value="sem-sugestao">Sem Sugestão</option>
+                    <option value="acertos-4">4+ Acertos</option>
+                    <option value="acertos-5">5+ Acertos</option>
+                </select>
+                <select id="ordenacaoHistorico" onchange="filtrarHistorico()" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-white">
+                    <option value="recente">Mais Recente</option>
+                    <option value="antigo">Mais Antigo</option>
+                    <option value="acertos">Mais Acertos</option>
+                </select>
+            </div>
+
+            <!-- Tabela de Histórico -->
+            <div class="glass rounded-2xl overflow-hidden">
+                <div class="overflow-x-auto max-h-[600px] overflow-y-auto">
+                    <table class="w-full text-sm">
+                        <thead class="bg-slate-800/70 sticky top-0 z-10">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-slate-400 font-medium">Concurso</th>
+                                <th class="px-4 py-3 text-left text-slate-400 font-medium">Data</th>
+                                <th class="px-4 py-3 text-center text-slate-400 font-medium">Resultado Oficial</th>
+                                <th class="px-4 py-3 text-center text-slate-400 font-medium">Sugestão IA</th>
+                                <th class="px-4 py-3 text-center text-slate-400 font-medium">Acertos</th>
+                                <th class="px-4 py-3 text-center text-slate-400 font-medium">Estratégia</th>
+                                <th class="px-4 py-3 text-right text-slate-400 font-medium">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaHistorico">
+                            <tr><td colspan="7" class="text-center py-8 text-slate-500">Carregando...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== TAB: TREINAMENTO IA ===== -->
+        <div id="tab-treinamento" class="tab-content fade-in">
+            <div class="flex items-center justify-between mb-5">
+                <h2 class="text-2xl font-bold gradient-text">🧠 Treinamento IA & Estratégias</h2>
+                <span id="iaStatusBadge" class="ai-badge idle"><i class="fas fa-circle text-xs mr-1"></i>Aguardando</span>
+            </div>
+
+            <!-- Status Cards -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-5">
+                <div class="stat-card border-l-4 border-indigo-500">
+                    <p class="text-slate-400 text-xs">Estratégias</p>
+                    <p class="text-2xl font-bold font-mono" id="iaEstrategiasCount">0/18</p>
+                    <div class="mt-2 progress-bar-track"><div id="iaEstrategiasBar" class="progress-bar-fill" style="width:0%"></div></div>
+                </div>
+                <div class="stat-card border-l-4 border-purple-500">
+                    <p class="text-slate-400 text-xs">Nível IA</p>
+                    <p class="text-xl font-bold" id="iaNivelConhecimento">Iniciante</p>
+                    <div class="mt-2 progress-bar-track"><div id="iaConhecimentoBar" class="progress-bar-fill" style="width:0%"></div></div>
+                </div>
+                <div class="stat-card border-l-4 border-emerald-500">
+                    <p class="text-slate-400 text-xs">Geração Atual</p>
+                    <p class="text-2xl font-bold font-mono text-emerald-400" id="iaGeracaoGlobal">0</p>
+                    <p class="text-xs text-slate-500 mt-1">ciclos de aprendizado</p>
+                </div>
+                <div class="stat-card border-l-4 border-amber-500">
+                    <p class="text-slate-400 text-xs">Última Atualização</p>
+                    <p class="text-base font-bold" id="iaUltimaAtualizacao">Nunca</p>
+                    <p class="text-xs text-slate-500 mt-1" id="iaTempoDecorrido">--</p>
+                </div>
+            </div>
+
+            <!-- Controle de Treinamento -->
+            <div class="glass rounded-2xl p-5 mb-5 border-2 border-indigo-500/30">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h3 class="text-base font-bold">Motor de Treinamento</h3>
+                        <p class="text-xs text-slate-400 mt-1">A IA aprende com o histórico real e tenta acertar os 6 números</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="toggleTreinamentoContinuo()" id="btnTreinamentoContinuo"
+                            class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl transition flex items-center gap-2 text-sm">
+                            <i class="fas fa-infinity"></i><span>Treinamento Contínuo</span>
+                        </button>
+                        <button onclick="iniciarAnalisePorEstrategia()" id="btnAnaliseEstrategia"
+                            class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl transition flex items-center gap-2 text-sm">
+                            <i class="fas fa-play"></i><span>Análise Única</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Status Treinamento Contínuo -->
+                <div id="statusTreinamentoContinuo" class="hidden mb-4 p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-lg">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-robot text-emerald-400 animate-pulse"></i>
+                            <span class="text-sm text-emerald-400 font-medium">Treinamento Ativo</span>
+                            <span class="text-xs text-slate-400" id="cicloTreinamento">Ciclo: 0</span>
+                            <span class="text-xs text-slate-400" id="melhoriaTreinamento">Melhoria: 0%</span>
+                        </div>
+                        <span class="text-xs font-mono text-emerald-400">G<span id="geracaoTreinamento">1</span></span>
+                    </div>
+                    <div class="mt-2 text-xs text-slate-500" id="logTreinamento">Aguardando...</div>
+                </div>
+
+                <!-- Progresso Análise -->
+                <div id="painelProgressoAnalise" class="hidden mb-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm text-slate-400" id="textoProgressoAnalise">Iniciando...</span>
+                        <span class="text-sm font-mono text-indigo-400" id="percentualAnalise">0%</span>
+                    </div>
+                    <div class="progress-bar-track"><div id="barraProgressoAnalise" class="progress-bar-fill" style="width:0%"></div></div>
+                </div>
+
+                <!-- Melhor Previsão Atual -->
+                <div id="iaCurrentPrediction" class="hidden mt-3">
+                    <div class="text-xs text-slate-400 mb-2">Melhor previsão atual da IA:</div>
+                    <div class="flex justify-center gap-2 flex-wrap" id="iaPredictionNumbers"></div>
+                </div>
+            </div>
+
+            <!-- Ranking Estratégias -->
+            <div class="glass rounded-2xl p-5 mb-5">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-base font-bold flex items-center gap-2"><i class="fas fa-crown text-amber-500"></i>Ranking das Estratégias</h3>
+                    <button onclick="verRankingCompleto()" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-xs transition">
+                        <i class="fas fa-chart-bar mr-1"></i>Ver Completo
+                    </button>
+                </div>
+                <div id="estrategiasPreview" class="space-y-2">
+                    <div class="text-center py-6 text-slate-500 text-sm"><i class="fas fa-info-circle mr-2"></i>Execute a análise para ver o ranking</div>
+                </div>
+            </div>
+
+            <!-- Resultados por Estratégia -->
+            <div class="glass rounded-2xl p-5">
+                <h3 class="text-base font-bold mb-4 flex items-center gap-2"><i class="fas fa-chart-bar text-indigo-500"></i>Performance em Tempo Real</h3>
+                <div id="resultadosEstrategias" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 max-h-48 overflow-y-auto">
+                    <div class="text-center text-slate-500 text-xs col-span-6 py-4">Inicie a análise para ver a performance</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== TAB: GLOBO ===== -->
+        <div id="tab-globo" class="tab-content fade-in">
+            <div class="flex items-center justify-between mb-5">
+                <h2 class="text-2xl font-bold gradient-text">🎰 Globo da Mega Sena</h2>
+                <div class="flex items-center gap-4 text-sm">
+                    <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-red-500 inline-block"></span><span class="text-slate-400">Quente</span></span>
+                    <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-blue-500 inline-block"></span><span class="text-slate-400">Frio</span></span>
+                    <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span><span class="text-slate-400">Neutro</span></span>
+                </div>
+            </div>
+            <div class="glass rounded-2xl p-6">
+                <div id="globeContainer" class="globe-grid"></div>
+                <div class="mt-6 grid grid-cols-3 gap-4">
+                    <div class="text-center p-3 bg-slate-800/50 rounded-xl"><div class="text-2xl font-bold text-red-400" id="globeHotCount">0</div><div class="text-xs text-slate-400">Quentes</div></div>
+                    <div class="text-center p-3 bg-slate-800/50 rounded-xl"><div class="text-2xl font-bold text-blue-400" id="globeColdCount">0</div><div class="text-xs text-slate-400">Frios</div></div>
+                    <div class="text-center p-3 bg-slate-800/50 rounded-xl"><div class="text-2xl font-bold text-amber-400" id="globeNeutralCount">0</div><div class="text-xs text-slate-400">Neutros</div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== TAB: SIMULADOR ===== -->
+        <div id="tab-simulador" class="tab-content fade-in">
+            <h2 class="text-2xl font-bold gradient-text mb-5">🎮 Simulador de Jogos</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                <div class="glass rounded-2xl p-5">
+                    <h3 class="text-base font-bold mb-4 flex items-center gap-2"><i class="fas fa-ticket-alt text-emerald-500"></i>Meus Jogos</h3>
+                    <div id="meusJogos" class="space-y-2 mb-4"></div>
+                    <button onclick="adicionarNovoJogo()" class="w-full py-3 border-2 border-dashed border-slate-600 hover:border-emerald-500 text-slate-400 hover:text-emerald-400 rounded-xl transition text-sm">
+                        <i class="fas fa-plus mr-2"></i>Adicionar Jogo
+                    </button>
+                </div>
+                <div class="glass rounded-2xl p-5">
+                    <h3 class="text-base font-bold mb-4 flex items-center gap-2"><i class="fas fa-calculator text-amber-500"></i>Simular Concurso</h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="text-xs text-slate-400 block mb-1">Número do Concurso</label>
+                            <input type="number" id="simConcurso" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:border-amber-500 focus:outline-none" placeholder="Ex: 3002">
+                        </div>
+                        <button onclick="simularConcurso()" class="w-full py-2.5 bg-amber-600 hover:bg-amber-500 text-white rounded-xl transition text-sm">
+                            <i class="fas fa-play mr-2"></i>Simular
+                        </button>
+                    </div>
+                    <div id="simResultado" class="mt-4 hidden"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== TAB: GESTÃO ===== -->
+        <div id="tab-gestao" class="tab-content fade-in">
+            <div class="flex items-center justify-between mb-5">
+                <h2 class="text-2xl font-bold gradient-text-green">⚙️ Gestão de Concursos</h2>
+                <button onclick="abrirModalConcurso()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl transition flex items-center gap-2 text-sm">
+                    <i class="fas fa-plus"></i><span>Novo Concurso</span>
+                </button>
+            </div>
+            <div class="glass rounded-2xl p-5 mb-5">
+                <h3 class="text-base font-bold mb-3 flex items-center gap-2"><i class="fas fa-list text-emerald-500"></i>Concursos Customizados</h3>
+                <div id="listaConcursosCustom" class="space-y-2">
+                    <div class="text-center text-slate-500 text-sm py-4">Nenhum concurso customizado adicionado</div>
+                </div>
+            </div>
+            <div class="glass rounded-2xl p-5">
+                <h3 class="text-base font-bold mb-3 flex items-center gap-2"><i class="fas fa-database text-blue-500"></i>Backup & Dados</h3>
+                <div class="flex gap-3 flex-wrap">
+                    <button onclick="exportarDados()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition text-sm"><i class="fas fa-download mr-2"></i>Exportar Dados</button>
+                    <button onclick="limparDados()" class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-xl transition text-sm"><i class="fas fa-trash mr-2"></i>Limpar Dados IA</button>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /content -->
+</div><!-- /container -->
+
+<!-- ===== MODAIS ===== -->
+
+<!-- Modal Concurso -->
+<div id="modalConcurso" class="modal-overlay" onclick="fecharModalConcurso(event)">
+    <div class="modal-content" onclick="event.stopPropagation()" style="max-width:480px;">
+        <div class="flex items-center justify-between mb-5">
+            <h3 class="text-lg font-bold gradient-text" id="tituloModalConcurso">Novo Concurso</h3>
+            <button onclick="fecharModalConcurso()" class="text-slate-400 hover:text-white"><i class="fas fa-times text-lg"></i></button>
+        </div>
+        <form id="formConcurso" onsubmit="salvarConcurso(event)">
+            <input type="hidden" id="concursoId">
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs text-slate-400 block mb-1">Número do Concurso</label>
+                    <input type="number" id="concursoNumero" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:border-emerald-500 focus:outline-none" placeholder="Ex: 3002">
+                </div>
+                <div>
+                    <label class="text-xs text-slate-400 block mb-1">Data do Sorteio</label>
+                    <input type="date" id="concursoData" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:border-emerald-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="text-xs text-slate-400 block mb-1">6 Números Sorteados</label>
+                    <div class="grid grid-cols-6 gap-2">
+                        <input type="number" min="1" max="60" class="concurso-numero w-full bg-slate-800 border border-slate-700 rounded-lg px-1 py-2.5 text-center text-white focus:border-emerald-500 focus:outline-none" placeholder="00">
+                        <input type="number" min="1" max="60" class="concurso-numero w-full bg-slate-800 border border-slate-700 rounded-lg px-1 py-2.5 text-center text-white focus:border-emerald-500 focus:outline-none" placeholder="00">
+                        <input type="number" min="1" max="60" class="concurso-numero w-full bg-slate-800 border border-slate-700 rounded-lg px-1 py-2.5 text-center text-white focus:border-emerald-500 focus:outline-none" placeholder="00">
+                        <input type="number" min="1" max="60" class="concurso-numero w-full bg-slate-800 border border-slate-700 rounded-lg px-1 py-2.5 text-center text-white focus:border-emerald-500 focus:outline-none" placeholder="00">
+                        <input type="number" min="1" max="60" class="concurso-numero w-full bg-slate-800 border border-slate-700 rounded-lg px-1 py-2.5 text-center text-white focus:border-emerald-500 focus:outline-none" placeholder="00">
+                        <input type="number" min="1" max="60" class="concurso-numero w-full bg-slate-800 border border-slate-700 rounded-lg px-1 py-2.5 text-center text-white focus:border-emerald-500 focus:outline-none" placeholder="00">
+                    </div>
+                </div>
+            </div>
+            <div class="flex gap-3 mt-5">
+                <button type="button" onclick="fecharModalConcurso()" class="flex-1 py-2.5 bg-slate-700 hover:bg-slate-600 text-white rounded-xl transition text-sm">Cancelar</button>
+                <button type="submit" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl transition text-sm"><i class="fas fa-save mr-2"></i>Salvar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Help -->
+<div id="helpModal" class="modal-overlay" onclick="closeHelp(event)">
+    <div class="modal-content" onclick="event.stopPropagation()" style="max-width:480px;">
+        <div class="flex items-center justify-between mb-5">
+            <h3 class="text-lg font-bold flex items-center gap-2"><i class="fas fa-keyboard text-indigo-500"></i>Atalhos de Teclado</h3>
+            <button onclick="closeHelp()" class="text-slate-400 hover:text-white"><i class="fas fa-times text-lg"></i></button>
+        </div>
+        <div class="space-y-2 text-sm">
+            <div class="flex justify-between p-2.5 bg-slate-800/50 rounded-lg"><span>Dashboard</span><kbd class="bg-slate-700 px-2 py-0.5 rounded font-mono text-xs">Ctrl+1</kbd></div>
+            <div class="flex justify-between p-2.5 bg-slate-800/50 rounded-lg"><span>Próximo Jogo</span><kbd class="bg-slate-700 px-2 py-0.5 rounded font-mono text-xs">Ctrl+2</kbd></div>
+            <div class="flex justify-between p-2.5 bg-slate-800/50 rounded-lg"><span>Histórico IA</span><kbd class="bg-slate-700 px-2 py-0.5 rounded font-mono text-xs">Ctrl+3</kbd></div>
+            <div class="flex justify-between p-2.5 bg-slate-800/50 rounded-lg"><span>Treinamento</span><kbd class="bg-slate-700 px-2 py-0.5 rounded font-mono text-xs">Ctrl+4</kbd></div>
+            <div class="flex justify-between p-2.5 bg-slate-800/50 rounded-lg"><span>Globo</span><kbd class="bg-slate-700 px-2 py-0.5 rounded font-mono text-xs">Ctrl+5</kbd></div>
+            <div class="flex justify-between p-2.5 bg-slate-800/50 rounded-lg"><span>Simulador</span><kbd class="bg-slate-700 px-2 py-0.5 rounded font-mono text-xs">Ctrl+6</kbd></div>
+            <div class="flex justify-between p-2.5 bg-slate-800/50 rounded-lg"><span>Treinamento Contínuo</span><kbd class="bg-slate-700 px-2 py-0.5 rounded font-mono text-xs">Ctrl+T</kbd></div>
+            <div class="flex justify-between p-2.5 bg-slate-800/50 rounded-lg"><span>Gerar Sugestão</span><kbd class="bg-slate-700 px-2 py-0.5 rounded font-mono text-xs">Ctrl+G</kbd></div>
+            <div class="flex justify-between p-2.5 bg-slate-800/50 rounded-lg"><span>Alternar Tema</span><kbd class="bg-slate-700 px-2 py-0.5 rounded font-mono text-xs">Ctrl+D</kbd></div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Número Detalhe -->
+<div id="numberModal" class="modal-overlay" onclick="closeNumberDetail(event)">
+    <div class="modal-content" onclick="event.stopPropagation()" style="max-width:420px;">
+        <div class="flex items-center justify-between mb-5">
+            <h3 class="text-lg font-bold" id="numberModalTitle">Detalhes</h3>
+            <button onclick="closeNumberDetail()" class="text-slate-400 hover:text-white"><i class="fas fa-times text-lg"></i></button>
+        </div>
+        <div id="numberModalContent"></div>
+    </div>
+</div>
+
+<script>
+// ============================================================
+// MEGA SENA PRO v3 - SISTEMA UNIFICADO
+// ============================================================
+
+// ============================================================
+// TEMA
+// ============================================================
+function toggleTheme() {
+    const html = document.documentElement;
+    const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('megaSenaTheme', next);
+    showToast(`Tema ${next === 'dark' ? 'escuro' : 'claro'} ativado`, 'info');
+}
+function loadTheme() {
+    const saved = localStorage.getItem('megaSenaTheme') || 'dark';
+    document.documentElement.setAttribute('data-theme', saved);
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function showToast(msg, type = 'info', dur = 4000) {
+    const c = document.getElementById('toastContainer');
+    const t = document.createElement('div');
+    t.className = `toast ${type}`;
+    const icons = { success:'<i class="fas fa-check-circle text-emerald-400"></i>', error:'<i class="fas fa-exclamation-circle text-rose-400"></i>', warning:'<i class="fas fa-exclamation-triangle text-amber-400"></i>', info:'<i class="fas fa-info-circle text-blue-400"></i>' };
+    t.innerHTML = `${icons[type]||icons.info}<span class="flex-1 text-sm">${msg}</span><button onclick="this.parentElement.remove()" class="text-slate-400 hover:text-white ml-2"><i class="fas fa-times text-xs"></i></button>`;
+    c.appendChild(t);
+    setTimeout(() => { t.style.opacity='0'; t.style.transform='translateX(100%)'; t.style.transition='all 0.3s'; setTimeout(()=>t.remove(),300); }, dur);
+}
+
+// ============================================================
+// TABS
+// ============================================================
+function showTab(name) {
+    document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active'); if(b.dataset.tab===name) b.classList.add('active'); });
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    const el = document.getElementById(`tab-${name}`);
+    if(el) { el.classList.add('active'); el.classList.remove('fade-in'); void el.offsetWidth; el.classList.add('fade-in'); }
+    if(name==='globo') renderGlobe();
+    if(name==='historico') renderizarTabelaHistorico();
+    if(name==='gestao') renderizarConcursosCustom();
+}
+
+// ============================================================
+// VARIÁVEIS GLOBAIS
+// ============================================================
+let estatisticas = null;
+let totalSorteios = 0;
+let historicoSorteios = [];
+let concursosCustomizados = [];
+let rankingEstrategias = [];
+let conhecimentoEstrategias = {};
+let historicoSugestoesIA = []; // { id, concursoId, numeros, estrategia, acertos, geracao, timestamp }
+let historicoSugestoesProximo = [];
+let ultimoResultadoInputado = null;
+let treinamentoContinuoAtivo = false;
+let analiseEmAndamento = false;
+let resultadosPorEstrategia = {};
+let geracaoTreinamento = 0;
+let cicloTreinamento = 0;
+let historicoMelhorias = [];
+let intervaloTreinamento = null;
+let autoUpdateSugestao = null;
+let isAutoUpdateActive = false;
+let sugestaoCounter = 1;
+let globeRendered = false;
+let chartsRendered = false;
+
+// ============================================================
+// ESTRATÉGIAS (18)
+// ============================================================
+const ESTRATEGIAS = [
+    { nome: 'Top 6 Frequentes', id: 'top6', peso: 1.0, desc: 'Os 6 números mais sorteados' },
+    { nome: 'Fibonacci Ponderado', id: 'fibonacci', peso: 1.0, desc: 'Fibonacci + atraso' },
+    { nome: 'Análise de Dezenas', id: 'dezenas', peso: 1.0, desc: 'Equilibra dezenas 1-10, 11-20...' },
+    { nome: 'Paridade Dinâmica', id: 'paridade', peso: 1.0, desc: 'Equilibra pares e ímpares' },
+    { nome: 'Soma Média Otimizada', id: 'soma', peso: 1.0, desc: 'Soma próxima à média (186)' },
+    { nome: 'Atraso Relativo', id: 'atraso', peso: 1.0, desc: 'Atrasados + quentes' },
+    { nome: 'Gap Analysis', id: 'gap', peso: 1.0, desc: 'Evita gaps grandes' },
+    { nome: 'Múltiplos Estratégicos', id: 'multiplos', peso: 1.0, desc: 'Múltiplos de 3, 7, 11' },
+    { nome: 'Primalidade', id: 'primos', peso: 1.0, desc: 'Números primos estatísticos' },
+    { nome: 'Sequência Histórica', id: 'sequencia', peso: 1.0, desc: 'Sequências recorrentes' },
+    { nome: 'Dígitos Significativos', id: 'digitos', peso: 1.0, desc: 'Frequência por dígito' },
+    { nome: 'Distribuição Geométrica', id: 'geometrica', peso: 1.0, desc: 'Distribuição espacial' },
+    { nome: 'Ciclo de Atraso', id: 'cicloatraso', peso: 1.0, desc: 'Ciclos de atraso' },
+    { nome: 'Análise Temporal', id: 'temporal', peso: 1.0, desc: 'Padrões por dia/mês' },
+    { nome: 'Clusterização Espacial', id: 'cluster', peso: 1.0, desc: 'Grupos próximos no cartão' },
+    { nome: 'Regressão Estatística', id: 'regressao', peso: 1.0, desc: 'Modelo preditivo' },
+    { nome: 'Clusters Numéricos', id: 'clusters', peso: 1.0, desc: 'Grupos consecutivos' },
+    { nome: 'Posição das Bolas', id: 'posicao', peso: 1.0, desc: 'Frequência por posição de saída' }
+];
+
+// ============================================================
+// INICIALIZAÇÃO
+// ============================================================
+async function iniciarSistema() {
+    loadTheme();
+    showToast('Iniciando Mega Sena PRO v3...', 'info');
+    await carregarDados();
+    await carregarConhecimento();
+    carregarDadosSalvos();
+    atualizarDashboard();
+    document.getElementById('loading').classList.add('hidden');
+    document.getElementById('content').classList.remove('hidden');
+    showToast(`Sistema carregado! ${totalSorteios} sorteios processados.`, 'success');
+}
+
+// ============================================================
+// CARREGAR DADOS
+// ============================================================
+async function carregarDados() {
+    try {
+        const r = await fetch('concursos.json');
+        if (r.ok) {
+            const dados = await r.json();
+            if (Array.isArray(dados) && dados.length > 0) {
+                historicoSorteios = dados;
+                totalSorteios = dados.length;
+            }
+        }
+    } catch(e) { console.error('Erro ao carregar concursos.json:', e); }
+
+    if (historicoSorteios.length === 0) gerarDadosSimulados();
+
+    calcularEstatisticas();
+
+    const ultimoConcurso = Math.max(...historicoSorteios.map(h => h.concurso || h.id || 0));
+    const proximoConcurso = ultimoConcurso + 1;
+    document.getElementById('totalSorteiosHeader').textContent = totalSorteios;
+    document.getElementById('kpiTotalSorteios').textContent = totalSorteios;
+    document.getElementById('headerProximoConcurso').textContent = proximoConcurso;
+    document.getElementById('proximoConcursoNum').textContent = proximoConcurso;
+}
+
+function gerarDadosSimulados() {
+    historicoSorteios = [];
+    for (let i = 1; i <= 100; i++) {
+        const nums = []; while(nums.length<6){const n=Math.floor(Math.random()*60)+1; if(!nums.includes(n))nums.push(n);}
+        historicoSorteios.push({ concurso:i, numeros:nums.sort((a,b)=>a-b), data:`2024-01-${String(i%30+1).padStart(2,'0')}` });
+    }
+    totalSorteios = 100;
+}
+
+function calcularEstatisticas() {
+    estatisticas = { frequencia:{}, atraso:{}, dezenas:{1:0,2:0,3:0,4:0,5:0,6:0}, soma:0 };
+    for(let i=1;i<=60;i++){estatisticas.frequencia[i]=0; estatisticas.atraso[i]=0;}
+    historicoSorteios.forEach(s => {
+        s.numeros.forEach(n => {
+            estatisticas.frequencia[n]++;
+            estatisticas.soma += n;
+            const d = Math.ceil(n/10); estatisticas.dezenas[d]++;
+        });
+    });
+    for(let i=1;i<=60;i++){
+        for(let j=historicoSorteios.length-1;j>=0;j--){
+            if(historicoSorteios[j].numeros.includes(i)){estatisticas.atraso[i]=historicoSorteios.length-1-j; break;}
+        }
+    }
+}
+
+// ============================================================
+// CARREGAR CONHECIMENTO (Servidor + localStorage)
+// ============================================================
+async function carregarConhecimento() {
+    try {
+        const r = await fetch('/api/carregar-conhecimento');
+        const d = await r.json();
+        if (d.sucesso && d.conhecimento) {
+            conhecimentoEstrategias = d.conhecimento;
+            rankingEstrategias = d.conhecimento.ranking || [];
+            localStorage.setItem('megaSenaPro_conhecimento', JSON.stringify(d.conhecimento));
+            atualizarStatusIA();
+            mostrarPreviewEstrategias();
+            return;
+        }
+    } catch(e) {}
+    const saved = localStorage.getItem('megaSenaPro_conhecimento');
+    if (saved) {
+        conhecimentoEstrategias = JSON.parse(saved);
+        rankingEstrategias = conhecimentoEstrategias.ranking || [];
+        atualizarStatusIA();
+        mostrarPreviewEstrategias();
+    }
+}
+
+async function salvarConhecimentoServidor() {
+    if (!rankingEstrategias.length) return;
+    try {
+        await fetch('/api/salvar-conhecimento', {
+            method:'POST', headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({ conhecimento: conhecimentoEstrategias, historico: rankingEstrategias })
+        });
+    } catch(e) {}
+}
+
+function salvarConhecimento() {
+    if (rankingEstrategias.length > 0) {
+        conhecimentoEstrategias = {
+            ...conhecimentoEstrategias,
+            ranking: rankingEstrategias,
+            totalAnalises: (conhecimentoEstrategias?.totalAnalises || 0) + 1,
+            ultimaAtualizacao: new Date().toISOString(),
+            pesosAprendidos: conhecimentoEstrategias?.pesosAprendidos || {}
+        };
+        localStorage.setItem('megaSenaPro_conhecimento', JSON.stringify(conhecimentoEstrategias));
+        atualizarStatusIA();
+    }
+}
+
+// ============================================================
+// CARREGAR DADOS SALVOS (localStorage)
+// ============================================================
+function carregarDadosSalvos() {
+    const c = localStorage.getItem('megaSenaPro_concursos');
+    if (c) concursosCustomizados = JSON.parse(c);
+
+    const s = localStorage.getItem('megaSenaPro_sugestoesIA');
+    if (s) historicoSugestoesIA = JSON.parse(s);
+
+    const sp = localStorage.getItem('megaSenaPro_sugestoesProximo');
+    if (sp) {
+        historicoSugestoesProximo = JSON.parse(sp);
+        if (historicoSugestoesProximo.length > 0) {
+            atualizarDisplaySugestaoAtual(historicoSugestoesProximo[0]);
+            atualizarDisplayHistoricoSugestoes();
+        }
+    }
+}
+
+function salvarSugestoesIA() {
+    localStorage.setItem('megaSenaPro_sugestoesIA', JSON.stringify(historicoSugestoesIA));
+}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+function atualizarDashboard() {
+    if (!estatisticas) return;
+    const sortedFreq = Object.entries(estatisticas.frequencia).sort((a,b)=>b[1]-a[1]);
+    const maisFreq = sortedFreq[0];
+    const sortedAtr = Object.entries(estatisticas.atraso).sort((a,b)=>b[1]-a[1]);
+    const maisAtrasado = sortedAtr[0];
+    document.getElementById('kpiMaisFrequente').textContent = maisFreq[0];
+    document.getElementById('kpiFreqCount').textContent = `${maisFreq[1]} vezes`;
+    document.getElementById('kpiMaisAtrasado').textContent = maisAtrasado[0];
+    document.getElementById('kpiAtrasoCount').textContent = `${maisAtrasado[1]} concursos`;
+    if (!chartsRendered) { renderCharts(); chartsRendered = true; }
+}
+
+function renderCharts() {
+    const ctxF = document.getElementById('chartFrequencia');
+    if (ctxF) {
+        const sorted = Object.entries(estatisticas.frequencia).sort((a,b)=>b[1]-a[1]).slice(0,20);
+        new Chart(ctxF, { type:'bar', data:{ labels:sorted.map(s=>s[0]), datasets:[{ label:'Frequência', data:sorted.map(s=>s[1]), backgroundColor:sorted.map((_,i)=>i<3?'#ef4444':i<6?'#fbbf24':'#3b82f6'), borderRadius:5 }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{ y:{grid:{color:'rgba(255,255,255,0.07)'},ticks:{color:'#94a3b8'}}, x:{grid:{display:false},ticks:{color:'#94a3b8'}} } } });
+    }
+    const ctxD = document.getElementById('chartDezenas');
+    if (ctxD) {
+        new Chart(ctxD, { type:'doughnut', data:{ labels:['1-10','11-20','21-30','31-40','41-50','51-60'], datasets:[{ data:Object.values(estatisticas.dezenas), backgroundColor:['#ef4444','#f97316','#fbbf24','#22c55e','#3b82f6','#a855f7'], borderWidth:0 }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'right',labels:{color:'#94a3b8',font:{size:11}}}} } });
+    }
+    const ctxT = document.getElementById('chartTendencias');
+    if (ctxT) {
+        const ultimos = historicoSorteios.slice(-100);
+        new Chart(ctxT, { type:'line', data:{ labels:ultimos.map((_,i)=>i+1), datasets:[{ label:'Soma', data:ultimos.map(s=>s.numeros.reduce((a,b)=>a+b,0)), borderColor:'#fbbf24', backgroundColor:'rgba(251,191,36,0.08)', fill:true, tension:0.4, pointRadius:0 }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{ y:{grid:{color:'rgba(255,255,255,0.07)'},ticks:{color:'#94a3b8'}}, x:{grid:{display:false},ticks:{display:false}} } } });
+    }
+}
+
+// ============================================================
+// GLOBO
+// ============================================================
+function renderGlobe() {
+    const c = document.getElementById('globeContainer');
+    if (!c || c.children.length > 0) return;
+    let hot=0,cold=0,neutral=0;
+    for(let i=1;i<=60;i++){
+        const el = document.createElement('div');
+        el.className = 'globe-number';
+        el.textContent = String(i).padStart(2,'0');
+        el.onclick = () => showNumberDetail(i);
+        const t = getNumberTemperature(i);
+        if(t==='hot'){el.style.background='linear-gradient(135deg,#ef4444,#dc2626)';el.style.color='white';hot++;}
+        else if(t==='cold'){el.style.background='linear-gradient(135deg,#3b82f6,#2563eb)';el.style.color='white';cold++;}
+        else{el.style.background='linear-gradient(135deg,#fbbf24,#f59e0b)';el.style.color='#1e293b';neutral++;}
+        c.appendChild(el);
+    }
+    document.getElementById('globeHotCount').textContent = hot;
+    document.getElementById('globeColdCount').textContent = cold;
+    document.getElementById('globeNeutralCount').textContent = neutral;
+}
+
+function getNumberTemperature(n) {
+    if (!estatisticas?.frequencia) return 'neutral';
+    const freq = estatisticas.frequencia[n]||0;
+    const vals = Object.values(estatisticas.frequencia).sort((a,b)=>b-a);
+    const ratio = (freq-vals[vals.length-1])/(vals[0]-vals[vals.length-1]);
+    if(ratio>=0.7) return 'hot';
+    if(ratio<=0.3) return 'cold';
+    return 'neutral';
+}
+
+function getHottestNumber() { return Object.entries(estatisticas?.frequencia||{}).sort((a,b)=>b[1]-a[1])[0]?.[0]||33; }
+function getColdestNumber() { return Object.entries(estatisticas?.frequencia||{}).sort((a,b)=>a[1]-b[1])[0]?.[0]||7; }
+
+// ============================================================
+// GERAÇÃO DE PREVISÕES POR ESTRATÉGIA
+// ============================================================
+function gerarPrevisaoPorEstrategia(sorted, estrategiaId, seed) {
+    const s = seed || 1000;
+    switch(estrategiaId) {
+        case 'top6': return sorted.slice(0,6).map(x=>x.numero);
+        case 'fibonacci': return sorted.slice(0,12).sort((a,b)=>estatisticas.atraso[b.numero]-estatisticas.atraso[a.numero]).slice(0,6).map(x=>x.numero);
+        case 'dezenas': return gerarPorDezenas(sorted);
+        case 'paridade': return gerarPorParidade(sorted);
+        case 'soma': return gerarPorSoma(sorted, s);
+        case 'atraso': return Object.entries(estatisticas.atraso).sort((a,b)=>b[1]-a[1]).slice(0,6).map(e=>parseInt(e[0]));
+        case 'gap': return gerarPorGap(sorted, s);
+        case 'multiplos': return gerarPorMultiplos(sorted);
+        case 'primos': return gerarPorPrimos(sorted);
+        case 'sequencia': return gerarPorSequencia(sorted, s);
+        case 'digitos': return gerarPorDigitos(sorted);
+        case 'geometrica': return gerarPorGeometrica(sorted, s);
+        case 'cicloatraso': return Object.entries(estatisticas.atraso).sort((a,b)=>b[1]-a[1]).slice(0,6).map(e=>parseInt(e[0]));
+        case 'temporal': return sorted.slice(0,6).map(x=>x.numero);
+        case 'cluster': return gerarPorClusters(sorted, s);
+        case 'regressao': return sorted.slice(0,10).sort(()=>Math.sin(s)*0.5).slice(0,6).map(x=>x.numero);
+        case 'clusters': return gerarPorClusters(sorted, s);
+        case 'posicao': return gerarPorPosicao(sorted, s);
+        default: return sorted.slice(0,6).map(x=>x.numero);
+    }
+}
+
+function gerarPorDezenas(sorted) {
+    const result=[]; const usados=new Set();
+    for(let d=1;d<=6;d++){
+        const cands=sorted.filter(x=>Math.ceil(x.numero/10)===d&&!usados.has(x.numero));
+        if(cands.length>0){result.push(cands[0].numero);usados.add(cands[0].numero);}
+    }
+    while(result.length<6){const n=sorted.find(x=>!usados.has(x.numero));if(!n)break;result.push(n.numero);usados.add(n.numero);}
+    return result.sort((a,b)=>a-b);
+}
+
+function gerarPorParidade(sorted) {
+    const pares=sorted.filter(x=>x.numero%2===0).slice(0,3).map(x=>x.numero);
+    const impares=sorted.filter(x=>x.numero%2!==0).slice(0,3).map(x=>x.numero);
+    return [...pares,...impares].sort((a,b)=>a-b);
+}
+
+function gerarPorSoma(sorted, seed) {
+    const alvo=186; let result=[]; let usados=new Set();
+    const cands=[...sorted];
+    for(let i=0;i<6;i++){
+        const restante=6-i; const somaAtual=result.reduce((a,b)=>a+b,0);
+        const alvoRestante=alvo-somaAtual;
+        const ideal=alvoRestante/restante;
+        const melhor=cands.filter(x=>!usados.has(x.numero)).sort((a,b)=>Math.abs(a.numero-ideal)-Math.abs(b.numero-ideal))[0];
+        if(melhor){result.push(melhor.numero);usados.add(melhor.numero);}
+    }
+    return result.sort((a,b)=>a-b);
+}
+
+function gerarPorGap(sorted, seed) {
+    const result=[sorted[0].numero]; const usados=new Set([sorted[0].numero]);
+    while(result.length<6){
+        const ultimo=result[result.length-1];
+        const prox=sorted.filter(x=>!usados.has(x.numero)&&Math.abs(x.numero-ultimo)>=3&&Math.abs(x.numero-ultimo)<=15);
+        if(prox.length>0){result.push(prox[0].numero);usados.add(prox[0].numero);}
+        else{const n=sorted.find(x=>!usados.has(x.numero));if(!n)break;result.push(n.numero);usados.add(n.numero);}
+    }
+    return result.sort((a,b)=>a-b);
+}
+
+function gerarPorMultiplos(sorted) {
+    const mult=[3,7,11]; const result=[]; const usados=new Set();
+    for(const m of mult){const cand=sorted.filter(x=>x.numero%m===0&&!usados.has(x.numero)).slice(0,2);cand.forEach(c=>{if(result.length<6){result.push(c.numero);usados.add(c.numero);}});}
+    while(result.length<6){const n=sorted.find(x=>!usados.has(x.numero));if(!n)break;result.push(n.numero);usados.add(n.numero);}
+    return result.sort((a,b)=>a-b);
+}
+
+function gerarPorPrimos(sorted) {
+    const primos=[2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59];
+    const result=sorted.filter(x=>primos.includes(x.numero)).slice(0,3).map(x=>x.numero);
+    const usados=new Set(result);
+    while(result.length<6){const n=sorted.find(x=>!usados.has(x.numero));if(!n)break;result.push(n.numero);usados.add(n.numero);}
+    return result.sort((a,b)=>a-b);
+}
+
+function gerarPorSequencia(sorted, seed) {
+    const ultimos5=historicoSorteios.slice(-5);
+    const pontos=new Map();
+    sorted.forEach(x=>pontos.set(x.numero,x.freq));
+    ultimos5.forEach(c=>{c.numeros.forEach(n=>{pontos.set(n,(pontos.get(n)||0)+5);});});
+    return Array.from(pontos.entries()).sort((a,b)=>b[1]-a[1]).slice(0,6).map(e=>e[0]).sort((a,b)=>a-b);
+}
+
+function gerarPorDigitos(sorted) {
+    const freqDigito=new Array(10).fill(0);
+    sorted.forEach(x=>{const d=x.numero%10;freqDigito[d]+=x.freq;});
+    const melhoresDigitos=freqDigito.map((f,d)=>({d,f})).sort((a,b)=>b.f-a.f).slice(0,4).map(x=>x.d);
+    const result=[]; const usados=new Set();
+    for(const d of melhoresDigitos){const cand=sorted.filter(x=>x.numero%10===d&&!usados.has(x.numero)).slice(0,2);cand.forEach(c=>{if(result.length<6){result.push(c.numero);usados.add(c.numero);}});}
+    while(result.length<6){const n=sorted.find(x=>!usados.has(x.numero));if(!n)break;result.push(n.numero);usados.add(n.numero);}
+    return result.sort((a,b)=>a-b);
+}
+
+function gerarPorGeometrica(sorted, seed) {
+    const quadrantes=[[1,15],[16,30],[31,45],[46,60]];
+    const result=[]; const usados=new Set();
+    for(const [min,max] of quadrantes){
+        const cand=sorted.filter(x=>x.numero>=min&&x.numero<=max&&!usados.has(x.numero));
+        if(cand.length>0){const escolhido=cand[Math.floor((seed%cand.length+cand.length)%cand.length)];result.push(escolhido.numero);usados.add(escolhido.numero);}
+    }
+    while(result.length<6){const n=sorted.find(x=>!usados.has(x.numero));if(!n)break;result.push(n.numero);usados.add(n.numero);}
+    return result.sort((a,b)=>a-b);
+}
+
+function gerarPorClusters(sorted, seed) {
+    const ultimos10=historicoSorteios.slice(-10);
+    const pontos=new Map();
+    sorted.forEach(x=>pontos.set(x.numero,x.freq));
+    ultimos10.forEach(c=>{const ord=[...c.numeros].sort((a,b)=>a-b);for(let i=0;i<ord.length-1;i++){const diff=ord[i+1]-ord[i];if(diff<=3){pontos.set(ord[i],(pontos.get(ord[i])||0)+(4-diff)*3);pontos.set(ord[i+1],(pontos.get(ord[i+1])||0)+(4-diff)*3);}}});
+    return Array.from(pontos.entries()).sort((a,b)=>b[1]-a[1]).slice(0,6).map(e=>e[0]).sort((a,b)=>a-b);
+}
+
+function gerarPorPosicao(sorted, seed) {
+    const posFreq=Array(6).fill(null).map(()=>new Map());
+    historicoSorteios.forEach((c,idx)=>{c.numeros.forEach((n,pos)=>{posFreq[pos].set(n,(posFreq[pos].get(n)||0)+1);});});
+    const result=[]; const usados=new Set();
+    for(let pos=0;pos<6;pos++){
+        const cands=Array.from(posFreq[pos].entries()).filter(([n])=>!usados.has(n)).sort((a,b)=>b[1]-a[1]);
+        if(cands.length>0){result.push(cands[0][0]);usados.add(cands[0][0]);}
+    }
+    while(result.length<6){const n=sorted.find(x=>!usados.has(x.numero));if(!n)break;result.push(n.numero);usados.add(n.numero);}
+    return result.sort((a,b)=>a-b);
+}
+
+// ============================================================
+// CALCULAR ACERTOS
+// ============================================================
+function calcularAcertos(sugestao, resultado) {
+    if (!sugestao || !resultado) return 0;
+    return sugestao.filter(n=>resultado.includes(n)).length;
+}
+
+// ============================================================
+// SUGESTÃO PRÓXIMO JOGO
+// ============================================================
+function gerarSugestaoProximoJogo() {
+    if (!estatisticas?.frequencia) { showToast('Aguarde carregar dados...','warning'); return; }
+    const sorted = Object.entries(estatisticas.frequencia).map(([n,f])=>({numero:parseInt(n),freq:f})).sort((a,b)=>b.freq-a.freq);
+    const ultimoConcurso = Math.max(...historicoSorteios.map(h=>h.concurso||h.id||0));
+    const proximoConcurso = ultimoConcurso + 1;
+    const timestamp = new Date();
+    const seedBase = (proximoConcurso*10000)+(geracaoTreinamento*1000)+(timestamp.getTime()%10000);
+
+    const sugestoesPorEstrategia = ESTRATEGIAS.map((est,idx)=>{
+        const seedEst = seedBase+(idx*100);
+        const numeros = gerarPrevisaoPorEstrategia(sorted, est.id, seedEst);
+        const pesoAprendido = conhecimentoEstrategias?.pesosAprendidos?.[est.id] || 1.0;
+        const mediaHistorica = resultadosPorEstrategia[est.id]?.mediaAcertos || 2.0;
+        const score = parseFloat(mediaHistorica) * pesoAprendido + (Math.random()*0.1);
+        return { estrategia:est.nome, estrategiaId:est.id, numeros, confianca:Math.min(95,Math.round((score/6)*100)), mediaHistorica:score, timestamp:timestamp.toISOString(), proximoConcurso, geracao:geracaoTreinamento };
+    });
+
+    sugestoesPorEstrategia.sort((a,b)=>b.mediaHistorica-a.mediaHistorica);
+    const melhor = sugestoesPorEstrategia[0];
+
+    historicoSugestoesProximo.unshift({...melhor, id:Date.now()});
+    if(historicoSugestoesProximo.length>20) historicoSugestoesProximo=historicoSugestoesProximo.slice(0,20);
+    localStorage.setItem('megaSenaPro_sugestoesProximo', JSON.stringify(historicoSugestoesProximo));
+
+    atualizarDisplaySugestaoAtual(melhor);
+    atualizarDisplayHistoricoSugestoes();
+    showToast(`Sugestão #${proximoConcurso}: ${melhor.numeros.join(', ')}`, 'success');
+}
+
+function atualizarDisplaySugestaoAtual(sug) {
+    document.getElementById('numerosSugestaoAtual').innerHTML = sug.numeros.map(n=>`
+        <div class="number-ball ia" style="width:56px;height:56px;font-size:1.1rem;">${n}</div>
+    `).join('');
+    document.getElementById('estrategiaSugestao').textContent = sug.estrategia;
+    document.getElementById('confiancaSugestao').textContent = sug.confianca+'%';
+    document.getElementById('geracaoSugestao').textContent = 'G'+sug.geracao;
+    document.getElementById('ultimaAtualizacaoSugestao').textContent = 'Última atualização: '+new Date(sug.timestamp).toLocaleString('pt-BR');
+}
+
+function atualizarDisplayHistoricoSugestoes() {
+    const c = document.getElementById('historicoSugestoesProximo');
+    if (historicoSugestoesProximo.length===0) { c.innerHTML='<div class="text-center text-slate-500 text-sm py-4">Nenhuma sugestão gerada ainda</div>'; return; }
+    c.innerHTML = historicoSugestoesProximo.map((sug,idx)=>`
+        <div class="p-2.5 bg-slate-800/50 rounded-lg flex items-center justify-between ${idx===0?'border border-pink-500/30':''}">
+            <div class="flex items-center gap-2">
+                <span class="text-xs text-slate-500 font-mono">#${sug.proximoConcurso}</span>
+                <div class="flex gap-1">${sug.numeros.map(n=>`<span class="w-6 h-6 rounded-full bg-indigo-600/50 text-white flex items-center justify-center text-xs font-bold">${n}</span>`).join('')}</div>
+            </div>
+            <div class="text-right">
+                <div class="text-xs text-pink-400">${sug.estrategia}</div>
+                <div class="text-xs text-slate-500">${new Date(sug.timestamp).toLocaleDateString('pt-BR')}</div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function toggleAutoSugestao() {
+    const btn=document.getElementById('btnAutoSugestao');
+    const icon=document.getElementById('iconAutoSugestao');
+    const text=document.getElementById('textAutoSugestao');
+    if (isAutoUpdateActive) {
+        clearInterval(autoUpdateSugestao); autoUpdateSugestao=null; isAutoUpdateActive=false;
+        icon.className='fas fa-play'; text.textContent='Auto: OFF';
+        btn.className='px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl transition flex items-center gap-2 text-sm';
+        showToast('Atualização automática desativada','info');
+    } else {
+        isAutoUpdateActive=true;
+        gerarSugestaoProximoJogo();
+        autoUpdateSugestao=setInterval(()=>{gerarSugestaoProximoJogo(); showToast('Sugestão atualizada automaticamente!','success');},300000);
+        icon.className='fas fa-stop'; text.textContent='Auto: ON';
+        btn.className='px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-xl transition flex items-center gap-2 text-sm';
+        showToast('Atualização automática ativada (5 min)','success');
+    }
+}
+
+// ============================================================
+// INPUTAR RESULTADO OFICIAL
+// ============================================================
+function inputarResultadoOficial() {
+    const ultimo = Math.max(...historicoSorteios.map(h=>h.concurso||h.id||0));
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay active';
+    modal.innerHTML = `
+        <div class="modal-content max-w-md" onclick="event.stopPropagation()">
+            <div class="flex items-center justify-between mb-5">
+                <h3 class="text-lg font-bold gradient-text"><i class="fas fa-plus-circle text-emerald-500 mr-2"></i>Inputar Resultado Oficial</h3>
+                <button onclick="this.closest('.modal-overlay').remove()" class="text-slate-400 hover:text-white"><i class="fas fa-times text-lg"></i></button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs text-slate-400 block mb-1">Concurso #${ultimo+1}</label>
+                    <input type="hidden" id="inputConcursoResultado" value="${ultimo+1}">
+                    <p class="text-xs text-slate-500">Será adicionado como próximo concurso</p>
+                </div>
+                <div>
+                    <label class="text-xs text-slate-400 block mb-1">6 Números Sorteados (separados por vírgula ou espaço)</label>
+                    <input type="text" id="inputNumerosResultado" placeholder="Ex: 5, 12, 23, 34, 45, 56"
+                        class="w-full bg-slate-700 border border-slate-600 rounded-lg p-3 text-white text-lg tracking-wider">
+                </div>
+                <div class="p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg">
+                    <p class="text-xs text-amber-400"><i class="fas fa-info-circle mr-1"></i>Após salvar, a IA comparará automaticamente com as sugestões anteriores</p>
+                </div>
+                <button onclick="salvarResultadoOficial()"
+                    class="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-medium transition text-sm">
+                    <i class="fas fa-save mr-2"></i>Salvar e Comparar
+                </button>
+            </div>
+        </div>`;
+    modal.onclick = () => modal.remove();
+    document.body.appendChild(modal);
+}
+
+function salvarResultadoOficial() {
+    const concurso = parseInt(document.getElementById('inputConcursoResultado').value);
+    const input = document.getElementById('inputNumerosResultado').value;
+    const numeros = input.split(/[\s,]+/).map(n=>parseInt(n.trim())).filter(n=>!isNaN(n)&&n>=1&&n<=60).slice(0,6);
+    if (numeros.length!==6) { showToast('Digite exatamente 6 números válidos (1-60)','error'); return; }
+    numeros.sort((a,b)=>a-b);
+    ultimoResultadoInputado = { concurso, numeros, data:new Date().toISOString() };
+    historicoSorteios.push(ultimoResultadoInputado);
+    document.querySelector('.modal-overlay.active')?.remove();
+    document.getElementById('painelAnaliseResultado').classList.remove('hidden');
+    compararSugestoesComResultado();
+    showToast(`Resultado #${concurso} salvo! Comparando com sugestões...`, 'success');
+}
+
+function compararSugestoesComResultado() {
+    if (!ultimoResultadoInputado || historicoSugestoesProximo.length===0) return;
+    const resultado = ultimoResultadoInputado.numeros;
+    const comparacoes = historicoSugestoesProximo.map(sug=>({...sug, acertos:calcularAcertos(sug.numeros,resultado)})).sort((a,b)=>b.acertos-a.acertos);
+    const c = document.getElementById('resultadoComparacao');
+    c.innerHTML = comparacoes.slice(0,5).map((comp,idx)=>{
+        const cor = comp.acertos>=4?'emerald':comp.acertos>=2?'amber':'slate';
+        return `<div class="p-3 bg-${cor}-500/10 rounded-lg border border-${cor}-500/30">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="text-sm font-medium">${['🥇','🥈','🥉','#4','#5'][idx]||'#'+(idx+1)}</span>
+                    <div><div class="text-sm font-medium">${comp.estrategia}</div><div class="text-xs text-slate-400">G${comp.geracao}</div></div>
+                </div>
+                <div class="text-2xl font-bold text-${cor}-400">${comp.acertos}/6</div>
+            </div>
+            <div class="mt-2 flex gap-1 flex-wrap">${comp.numeros.map(n=>`<span class="w-7 h-7 rounded-full ${resultado.includes(n)?'bg-emerald-500 text-white':'bg-slate-700 text-slate-400'} flex items-center justify-center text-xs font-bold">${n}</span>`).join('')}</div>
+        </div>`;
+    }).join('');
+    const melhor = comparacoes[0];
+    document.getElementById('melhorSugestaoHistorico').innerHTML = `<div class="flex items-center justify-between"><div><h4 class="text-sm font-bold text-emerald-400 mb-1"><i class="fas fa-trophy mr-1"></i>Melhor Sugestão</h4><p class="text-white text-sm">${melhor.estrategia}: ${melhor.acertos} acertos</p></div><div class="text-3xl font-bold text-emerald-400">${melhor.acertos}/6</div></div>`;
+    window.ultimaComparacao = comparacoes;
+}
+
+function aprenderComResultado() {
+    if (!window.ultimaComparacao?.length) { showToast('Nenhuma comparação disponível','error'); return; }
+    const melhor = window.ultimaComparacao[0];
+    if (!conhecimentoEstrategias.pesosAprendidos) conhecimentoEstrategias.pesosAprendidos = {};
+    if (!conhecimentoEstrategias.pesosAprendidos[melhor.estrategiaId]) conhecimentoEstrategias.pesosAprendidos[melhor.estrategiaId] = 1.0;
+    conhecimentoEstrategias.pesosAprendidos[melhor.estrategiaId] += 0.1;
+    if (!conhecimentoEstrategias.aprendizadoPorResultado) conhecimentoEstrategias.aprendizadoPorResultado = [];
+    conhecimentoEstrategias.aprendizadoPorResultado.push({ concurso:ultimoResultadoInputado.concurso, melhorEstrategia:melhor.estrategiaId, acertos:melhor.acertos, timestamp:new Date().toISOString() });
+    salvarConhecimento();
+    salvarConhecimentoServidor();
+    showToast(`IA aprendeu! ${melhor.estrategia} +0.1 de peso (${melhor.acertos} acertos)`, 'success');
+}
+
+// ============================================================
+// HISTÓRICO IA - GERAÇÃO RETROATIVA (CORREÇÃO DO BUG)
+// ============================================================
+function renderizarTabelaHistorico() {
+    const filtro = document.getElementById('filtroHistorico')?.value || 'todos';
+    const busca = document.getElementById('buscaHistorico')?.value || '';
+    const ordem = document.getElementById('ordenacaoHistorico')?.value || 'recente';
+
+    const sorted = Object.entries(estatisticas?.frequencia||{}).map(([n,f])=>({numero:parseInt(n),freq:f})).sort((a,b)=>b.freq-a.freq);
+    const melhorEstrategia = rankingEstrategias[0] || ESTRATEGIAS[0];
+
+    let todos = [...historicoSorteios, ...concursosCustomizados];
+
+    // Ordenação
+    if (ordem==='recente') todos.sort((a,b)=>(b.concurso||b.id||0)-(a.concurso||a.id||0));
+    else if (ordem==='antigo') todos.sort((a,b)=>(a.concurso||a.id||0)-(b.concurso||b.id||0));
+
+    // Garantir sugestão para TODOS (correção do bug)
+    todos.forEach(c => {
+        const cId = c.concurso||c.id||0;
+        let sug = historicoSugestoesIA.find(s=>s.concursoId===cId);
+        if (!sug) {
+            const seed = cId * 1000 + (melhorEstrategia.id?.length||4);
+            const numeros = gerarPrevisaoPorEstrategia(sorted, melhorEstrategia.id||'top6', seed);
+            sug = { id:Date.now()+cId, concursoId:cId, numeros, estrategia:melhorEstrategia.nome||'Top 6', acertos:calcularAcertos(numeros, c.numeros), geracao:geracaoTreinamento||0, timestamp:new Date().toISOString() };
+            historicoSugestoesIA.push(sug);
+        }
+    });
+    salvarSugestoesIA();
+
+    // Filtros
+    let filtrados = todos.filter(c => {
+        const cId = c.concurso||c.id||0;
+        if (busca && !String(cId).includes(busca)) return false;
+        const sug = historicoSugestoesIA.find(s=>s.concursoId===cId);
+        if (filtro==='com-sugestao' && !sug) return false;
+        if (filtro==='sem-sugestao' && sug) return false;
+        if (filtro==='acertos-4' && (!sug || sug.acertos<4)) return false;
+        if (filtro==='acertos-5' && (!sug || sug.acertos<5)) return false;
+        return true;
+    });
+
+    if (ordem==='acertos') filtrados.sort((a,b)=>{
+        const sA=historicoSugestoesIA.find(s=>s.concursoId===(a.concurso||a.id||0));
+        const sB=historicoSugestoesIA.find(s=>s.concursoId===(b.concurso||b.id||0));
+        return (sB?.acertos||0)-(sA?.acertos||0);
+    });
+
+    // Atualizar stats
+    const comSugestao = historicoSugestoesIA.length;
+    const comAcertos = historicoSugestoesIA.filter(s=>s.acertos!==null&&s.acertos!==undefined);
+    const media = comAcertos.length>0?(comAcertos.reduce((a,s)=>a+s.acertos,0)/comAcertos.length).toFixed(1):'0.0';
+    const melhor = comAcertos.length>0?Math.max(...comAcertos.map(s=>s.acertos)):0;
+    document.getElementById('totalConcursosHistorico').textContent = todos.length;
+    document.getElementById('totalComSugestao').textContent = comSugestao;
+    document.getElementById('mediaAcertosHistorico').textContent = media;
+    document.getElementById('melhorAcertoHistorico').textContent = melhor;
+
+    // Renderizar tabela (máximo 200 linhas para performance)
+    const tbody = document.getElementById('tabelaHistorico');
+    const exibir = filtrados.slice(0, 200);
+
+    if (exibir.length===0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-slate-500"><i class="fas fa-inbox mr-2"></i>Nenhum concurso encontrado</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = exibir.map(c => {
+        const cId = c.concurso||c.id||0;
+        const numeros = c.numeros||[];
+        const sug = historicoSugestoesIA.find(s=>s.concursoId===cId);
+        const acertos = sug?.acertos??0;
+        const acertosCls = `acertos-${Math.min(acertos,6)}`;
+
+        return `<tr class="border-b border-slate-800/50 hover:bg-slate-800/30 transition">
+            <td class="px-4 py-2.5"><span class="font-mono font-bold text-indigo-400 text-sm">#${cId}</span></td>
+            <td class="px-4 py-2.5 text-slate-400 text-xs">${formatarData(c.data)}</td>
+            <td class="px-4 py-2.5">
+                <div class="flex justify-center gap-1 flex-wrap">
+                    ${numeros.map(n=>`<span class="w-7 h-7 rounded-full bg-emerald-600/30 text-emerald-300 flex items-center justify-center text-xs font-bold">${n}</span>`).join('')}
+                </div>
+            </td>
+            <td class="px-4 py-2.5">
+                ${sug ? `<div class="flex justify-center gap-1 flex-wrap">${sug.numeros.map(n=>`<span class="w-7 h-7 rounded-full ${numeros.includes(n)?'bg-amber-500 text-slate-900':'bg-indigo-600/40 text-indigo-300'} flex items-center justify-center text-xs font-bold">${n}</span>`).join('')}</div>` : '<span class="text-slate-600 text-xs">-</span>'}
+            </td>
+            <td class="px-4 py-2.5 text-center">
+                ${sug ? `<span class="acertos-badge ${acertosCls}">${acertos} acertos</span>` : '<span class="text-slate-600 text-xs">-</span>'}
+            </td>
+            <td class="px-4 py-2.5 text-center">
+                <span class="text-xs text-slate-500 truncate max-w-24 block">${sug?.estrategia||'-'}</span>
+            </td>
+            <td class="px-4 py-2.5 text-right">
+                <button onclick="regenerarSugestao(${cId})" class="text-indigo-400 hover:text-indigo-300 text-xs mr-2" title="Regenerar sugestão IA">
+                    <i class="fas fa-sync"></i>
+                </button>
+                <button onclick="verDetalhesConcurso(${cId})" class="text-amber-400 hover:text-amber-300 text-xs" title="Ver detalhes">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </td>
+        </tr>`;
+    }).join('');
+}
+
+function filtrarHistorico() { renderizarTabelaHistorico(); }
+
+// Regenerar sugestão para um concurso específico (com melhor estratégia atual)
+function regenerarSugestao(cId) {
+    const c = [...historicoSorteios,...concursosCustomizados].find(x=>(x.concurso||x.id||0)===cId);
+    if (!c) return;
+    const sorted = Object.entries(estatisticas.frequencia).map(([n,f])=>({numero:parseInt(n),freq:f})).sort((a,b)=>b.freq-a.freq);
+    const melhorEst = rankingEstrategias[0]||ESTRATEGIAS[0];
+    const seed = cId*1000+Date.now()%1000;
+    const numeros = gerarPrevisaoPorEstrategia(sorted, melhorEst.id||'top6', seed);
+    const idx = historicoSugestoesIA.findIndex(s=>s.concursoId===cId);
+    const novaSug = { id:Date.now(), concursoId:cId, numeros, estrategia:melhorEst.nome, acertos:calcularAcertos(numeros,c.numeros), geracao:geracaoTreinamento, timestamp:new Date().toISOString() };
+    if(idx>=0) historicoSugestoesIA[idx]=novaSug; else historicoSugestoesIA.push(novaSug);
+    salvarSugestoesIA();
+    renderizarTabelaHistorico();
+    showToast(`Sugestão regenerada para #${cId}: ${numeros.join(', ')}`, 'success');
+}
+
+// Gerar sugestões retroativas para TODOS os concursos
+async function gerarSugestoesRetroativas() {
+    if (!estatisticas?.frequencia) { showToast('Aguarde carregar dados...','warning'); return; }
+    const btn = document.getElementById('btnGerarRetroativas');
+    const status = document.getElementById('statusGeracaoRetroativa');
+    const progresso = document.getElementById('progressoRetroativo');
+    const barra = document.getElementById('barraRetroativa');
+    const texto = document.getElementById('textoProgressoRetroativo');
+    const perc = document.getElementById('percentualRetroativo');
+
+    btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Gerando...';
+    status.classList.remove('hidden'); progresso.classList.remove('hidden');
+    historicoSugestoesIA = []; // Limpar e regenerar tudo
+
+    const sorted = Object.entries(estatisticas.frequencia).map(([n,f])=>({numero:parseInt(n),freq:f})).sort((a,b)=>b.freq-a.freq);
+    const todos = [...historicoSorteios,...concursosCustomizados].sort((a,b)=>(a.concurso||a.id||0)-(b.concurso||b.id||0));
+    const total = todos.length;
+
+    for (let i=0; i<total; i++) {
+        const c = todos[i];
+        const cId = c.concurso||c.id||0;
+        // Usar estratégia que melhor performou até este ponto
+        const estAtual = rankingEstrategias[0]||ESTRATEGIAS[i%ESTRATEGIAS.length];
+        const seed = cId*1000+(i*7);
+        const numeros = gerarPrevisaoPorEstrategia(sorted, estAtual.id||'top6', seed);
+        historicoSugestoesIA.push({ id:Date.now()+i, concursoId:cId, numeros, estrategia:estAtual.nome||'Top 6', acertos:calcularAcertos(numeros,c.numeros), geracao:geracaoTreinamento, timestamp:new Date().toISOString() });
+
+        if (i%100===0) {
+            const p = Math.round((i/total)*100);
+            barra.style.width=p+'%'; perc.textContent=p+'%'; texto.textContent=`Processando concurso #${cId} (${i+1}/${total})`;
+            document.getElementById('textoGeracaoRetroativa').textContent = `${i+1}/${total} concursos...`;
+            await new Promise(r=>setTimeout(r,1));
+        }
+    }
+
+    salvarSugestoesIA();
+    barra.style.width='100%'; perc.textContent='100%';
+    setTimeout(()=>{progresso.classList.add('hidden'); status.classList.add('hidden');},2000);
+    btn.disabled=false; btn.innerHTML='<i class="fas fa-magic mr-2"></i>Gerar Sugestões p/ Todos';
+    renderizarTabelaHistorico();
+    showToast(`Sugestões geradas para todos os ${total} concursos!`, 'success');
+}
+
+// ============================================================
+// STATUS IA
+// ============================================================
+function atualizarStatusIA() {
+    if (!conhecimentoEstrategias) return;
+    const n = rankingEstrategias.length;
+    document.getElementById('iaEstrategiasCount').textContent = `${n}/18`;
+    document.getElementById('iaEstrategiasBar').style.width = `${(n/18)*100}%`;
+    const total = conhecimentoEstrategias.totalAnalises||0;
+    let nivel='Iniciante', pct=5;
+    if(total>=100){nivel='Mestre';pct=100;}
+    else if(total>=50){nivel='Especialista';pct=75;}
+    else if(total>=20){nivel='Avançado';pct=50;}
+    else if(total>=5){nivel='Intermediário';pct=25;}
+    else pct=Math.max(5,total*5);
+    document.getElementById('iaNivelConhecimento').textContent = nivel;
+    document.getElementById('iaConhecimentoBar').style.width = `${pct}%`;
+    const ua = conhecimentoEstrategias.ultimaAtualizacao;
+    if(ua){
+        document.getElementById('iaUltimaAtualizacao').textContent = new Date(ua).toLocaleDateString('pt-BR');
+        const diff = Date.now()-new Date(ua).getTime();
+        const h=Math.floor(diff/3600000), d=Math.floor(h/24);
+        document.getElementById('iaTempoDecorrido').textContent = d>0?`há ${d} dia(s)`:h>0?`há ${h} hora(s)`:'há poucos minutos';
+    }
+    document.getElementById('iaGeracaoGlobal').textContent = geracaoTreinamento;
+    // Header badge
+    const badge = document.getElementById('headerAiStatus');
+    const badgeText = document.getElementById('headerAiText');
+    badge.classList.remove('hidden');
+    if(treinamentoContinuoAtivo){badge.className='ai-badge learning hidden md:flex';badgeText.textContent='IA Treinando';}
+    else if(n>0){badge.className='ai-badge trained hidden md:flex';badgeText.textContent=`IA: ${nivel}`;}
+    else{badge.className='ai-badge idle hidden md:flex';badgeText.textContent='IA Aguardando';}
+}
+
+function atualizarStatusConhecimentoIA() { atualizarStatusIA(); }
+
+function mostrarConhecimentoCarregado() {
+    mostrarPreviewEstrategias();
+    atualizarStatusIA();
+}
+
+function mostrarPreviewEstrategias() {
+    const c = document.getElementById('estrategiasPreview');
+    if (!c) return;
+    if (rankingEstrategias.length===0) { c.innerHTML='<div class="text-center py-6 text-slate-500 text-sm"><i class="fas fa-info-circle mr-2"></i>Execute a análise para ver o ranking</div>'; return; }
+    c.innerHTML = rankingEstrategias.slice(0,5).map((e,i)=>`
+        <div class="strategy-card rank-${i+1} flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg ${i===0?'bg-yellow-500':i===1?'bg-slate-400':i===2?'bg-orange-600':'bg-slate-700'} flex items-center justify-center font-bold text-sm text-white">${i+1}</div>
+                <div><div class="font-semibold text-sm">${e.nome}</div><div class="text-xs text-slate-400">${e.desc||''}</div></div>
+            </div>
+            <div class="text-right"><div class="font-bold font-mono ${i<3?'text-emerald-400':'text-slate-400'} text-sm">${e.media||e.mediaAcertos||'0.00'}/6</div><div class="text-xs text-slate-500">média</div></div>
+        </div>
+    `).join('');
+}
+
+function verRankingCompleto() {
+    if (!rankingEstrategias.length) { showToast('Execute a análise primeiro!','warning'); return; }
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay active';
+    modal.innerHTML = `
+        <div class="modal-content max-w-2xl" onclick="event.stopPropagation()">
+            <div class="flex items-center justify-between mb-5">
+                <h3 class="text-xl font-bold gradient-text">Ranking Completo - ${rankingEstrategias.length} Estratégias</h3>
+                <button onclick="this.closest('.modal-overlay').remove()" class="text-slate-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <div class="space-y-2 overflow-y-auto max-h-[65vh]">
+                ${rankingEstrategias.map((e,i)=>`
+                    <div class="flex items-center justify-between p-3 bg-slate-800/50 rounded-xl ${i<3?'border-l-4 '+(i===0?'border-yellow-500':i===1?'border-slate-400':'border-orange-600'):''}">
+                        <div class="flex items-center gap-3">
+                            <span class="text-xl w-8 text-center">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</span>
+                            <div><div class="font-bold text-sm">${e.nome}</div><div class="text-xs text-slate-400">${e.desc||''}</div></div>
+                        </div>
+                        <div class="text-right"><div class="text-xl font-bold font-mono ${i<3?'text-emerald-400':'text-slate-400'}">${e.media||e.mediaAcertos||'0.00'}</div><div class="text-xs text-slate-500">acertos médios</div></div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>`;
+    modal.onclick = e => { if(e.target===modal) modal.remove(); };
+    document.body.appendChild(modal);
+}
+
+// ============================================================
+// TREINAMENTO IA
+// ============================================================
+function toggleTreinamentoContinuo() {
+    if (treinamentoContinuoAtivo) {
+        treinamentoContinuoAtivo=false; clearInterval(intervaloTreinamento);
+        document.getElementById('statusTreinamentoContinuo').classList.add('hidden');
+        document.getElementById('btnTreinamentoContinuo').innerHTML='<i class="fas fa-infinity"></i><span>Treinamento Cont
+ínuo</span>';
+        atualizarStatusIA();
+        showToast('Treinamento contínuo pausado','info');
+    } else {
+        if (!estatisticas?.frequencia) { showToast('Aguarde carregar dados...','warning'); return; }
+        treinamentoContinuoAtivo=true;
+        document.getElementById('statusTreinamentoContinuo').classList.remove('hidden');
+        document.getElementById('btnTreinamentoContinuo').innerHTML='<i class="fas fa-stop"></i><span>Parar Treinamento</span>';
+        executarCicloTreinamento();
+        intervaloTreinamento = setInterval(executarCicloTreinamento, 5000);
+        atualizarStatusIA();
+        showToast('Treinamento contínuo iniciado! A IA aprenderá continuamente.','success');
+    }
+}
+
+function executarCicloTreinamento() {
+    if (!estatisticas?.frequencia) return;
+    cicloTreinamento++;
+    geracaoTreinamento++;
+    document.getElementById('cicloTreinamento').textContent = `Ciclo: ${cicloTreinamento}`;
+    document.getElementById('geracaoTreinamento').textContent = geracaoTreinamento;
+    document.getElementById('iaGeracaoGlobal').textContent = geracaoTreinamento;
+
+    const sorted = Object.entries(estatisticas.frequencia).map(([n,f])=>({numero:parseInt(n),freq:f})).sort((a,b)=>b.freq-a.freq);
+
+    // Testar cada estratégia em 20 sorteios aleatórios do histórico
+    const amostra = historicoSorteios.slice(-200);
+    const resultados = {};
+
+    ESTRATEGIAS.forEach(est => {
+        let totalAcertos = 0; let jogos = 0;
+        const testeSorteios = amostra.slice(-20);
+        testeSorteios.forEach((c, idx) => {
+            const seed = (c.concurso||c.id||0)*100 + geracaoTreinamento + idx;
+            const previsao = gerarPrevisaoPorEstrategia(sorted, est.id, seed);
+            totalAcertos += calcularAcertos(previsao, c.numeros);
+            jogos++;
+        });
+        const media = jogos > 0 ? (totalAcertos/jogos).toFixed(2) : '0.00';
+        if (!resultadosPorEstrategia[est.id]) resultadosPorEstrategia[est.id] = { mediaAcertos:'0.00', melhoriasConsecutivas:0, melhorSeed:0 };
+        const anterior = parseFloat(resultadosPorEstrategia[est.id].mediaAcertos);
+        const atual = parseFloat(media);
+        if (atual > anterior) resultadosPorEstrategia[est.id].melhoriasConsecutivas++;
+        else resultadosPorEstrategia[est.id].melhoriasConsecutivas = 0;
+        resultadosPorEstrategia[est.id].mediaAcertos = media;
+        resultadosPorEstrategia[est.id].melhorSeed = geracaoTreinamento;
+        resultados[est.id] = { nome:est.nome, media, acertos:totalAcertos, jogos };
+    });
+
+    // Atualizar ranking
+    rankingEstrategias = ESTRATEGIAS.map(est => ({
+        ...est,
+        media: resultadosPorEstrategia[est.id]?.mediaAcertos || '0.00',
+        mediaAcertos: resultadosPorEstrategia[est.id]?.mediaAcertos || '0.00',
+        acertos: parseInt((resultadosPorEstrategia[est.id]?.mediaAcertos||0)*20),
+        jogos: 20
+    })).sort((a,b) => parseFloat(b.media)-parseFloat(a.media));
+
+    // Melhor previsão atual
+    const melhorEst = rankingEstrategias[0];
+    const melhorPrevisao = gerarPrevisaoPorEstrategia(sorted, melhorEst.id, geracaoTreinamento*1000);
+    document.getElementById('iaCurrentPrediction').classList.remove('hidden');
+    document.getElementById('iaPredictionNumbers').innerHTML = melhorPrevisao.map(n=>`<span class="number-ball ia" style="width:40px;height:40px;font-size:0.85rem;">${n}</span>`).join('');
+
+    // Atualizar display de resultados
+    const rc = document.getElementById('resultadosEstrategias');
+    if (rc) {
+        rc.innerHTML = rankingEstrategias.slice(0,6).map((e,i)=>`
+            <div class="p-2 bg-slate-800/50 rounded-lg text-center border ${i===0?'border-amber-500/50':'border-transparent'}">
+                <div class="text-xs text-slate-400 truncate mb-1">${e.nome}</div>
+                <div class="text-lg font-bold font-mono ${i===0?'text-amber-400':i===1?'text-slate-300':i===2?'text-orange-400':'text-slate-500'}">${e.media}</div>
+                <div class="text-xs text-slate-500">acertos</div>
+            </div>
+        `).join('');
+    }
+
+    // Log
+    const melhoria = rankingEstrategias[0] ? `${rankingEstrategias[0].nome}: ${rankingEstrategias[0].media}` : '';
+    document.getElementById('logTreinamento').textContent = `G${geracaoTreinamento}: Melhor → ${melhoria}`;
+    document.getElementById('melhoriaTreinamento').textContent = `Melhor: ${rankingEstrategias[0]?.media||'0.00'}/6`;
+
+    salvarConhecimento();
+    mostrarPreviewEstrategias();
+}
+
+function iniciarAnalisePorEstrategia() {
+    if (!estatisticas?.frequencia) { showToast('Aguarde carregar dados...','warning'); return; }
+    if (analiseEmAndamento) { showToast('Análise já em andamento...','warning'); return; }
+    analiseEmAndamento = true;
+    const btn = document.getElementById('btnAnaliseEstrategia');
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Analisando...</span>';
+    btn.disabled = true;
+    document.getElementById('painelProgressoAnalise').classList.remove('hidden');
+
+    let idx = 0;
+    const total = ESTRATEGIAS.length;
+    const sorted = Object.entries(estatisticas.frequencia).map(([n,f])=>({numero:parseInt(n),freq:f})).sort((a,b)=>b.freq-a.freq);
+    const amostra = historicoSorteios.slice(-50);
+
+    function analisarProxima() {
+        if (idx >= total) {
+            analiseEmAndamento = false;
+            btn.innerHTML = '<i class="fas fa-play"></i><span>Análise Única</span>';
+            btn.disabled = false;
+            document.getElementById('painelProgressoAnalise').classList.add('hidden');
+            rankingEstrategias.sort((a,b)=>parseFloat(b.media||b.mediaAcertos||0)-parseFloat(a.media||a.mediaAcertos||0));
+            salvarConhecimento();
+            salvarConhecimentoServidor();
+            mostrarPreviewEstrategias();
+            atualizarStatusIA();
+            showToast(`Análise completa! Melhor: ${rankingEstrategias[0]?.nome}`, 'success');
+            return;
+        }
+        const est = ESTRATEGIAS[idx];
+        let totalAcertos = 0;
+        amostra.forEach((c, i) => {
+            const seed = (c.concurso||c.id||0)*100+i;
+            const previsao = gerarPrevisaoPorEstrategia(sorted, est.id, seed);
+            totalAcertos += calcularAcertos(previsao, c.numeros);
+        });
+        const media = (totalAcertos/amostra.length).toFixed(2);
+        const existente = rankingEstrategias.findIndex(r=>r.id===est.id);
+        if (existente>=0) rankingEstrategias[existente] = {...est, media, mediaAcertos:media, acertos:totalAcertos, jogos:amostra.length};
+        else rankingEstrategias.push({...est, media, mediaAcertos:media, acertos:totalAcertos, jogos:amostra.length});
+        const pct = Math.round(((idx+1)/total)*100);
+        document.getElementById('barraProgressoAnalise').style.width = pct+'%';
+        document.getElementById('percentualAnalise').textContent = pct+'%';
+        document.getElementById('textoProgressoAnalise').textContent = `Analisando: ${est.nome} (${idx+1}/${total})`;
+        idx++;
+        setTimeout(analisarProxima, 50);
+    }
+    analisarProxima();
+}
+
+// ============================================================
+// SIMULADOR
+// ============================================================
+let meusJogos = [];
+
+function adicionarNovoJogo() {
+    const jogo = [];
+    while(jogo.length<6){const n=Math.floor(Math.random()*60)+1;if(!jogo.includes(n))jogo.push(n);}
+    jogo.sort((a,b)=>a-b);
+    meusJogos.push({id:Date.now(), numeros:jogo});
+    renderizarMeusJogos();
+    showToast('Jogo adicionado! Edite os números clicando neles.','info');
+}
+
+function renderizarMeusJogos() {
+    const c = document.getElementById('meusJogos');
+    if (meusJogos.length===0) { c.innerHTML='<div class="text-center text-slate-500 text-sm py-4">Nenhum jogo adicionado</div>'; return; }
+    c.innerHTML = meusJogos.map((j,idx)=>`
+        <div class="p-3 bg-slate-800/50 rounded-xl border border-slate-700 flex items-center justify-between">
+            <div class="flex gap-1.5 flex-wrap">
+                ${j.numeros.map(n=>`<span class="w-8 h-8 rounded-full bg-emerald-600/30 text-emerald-300 flex items-center justify-center text-xs font-bold">${n}</span>`).join('')}
+            </div>
+            <div class="flex gap-2">
+                <button onclick="usarSugestaoIA(${idx})" class="text-indigo-400 hover:text-indigo-300 text-xs" title="Usar sugestão IA"><i class="fas fa-robot"></i></button>
+                <button onclick="removerJogo(${idx})" class="text-red-400 hover:text-red-300 text-xs" title="Remover"><i class="fas fa-trash"></i></button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function usarSugestaoIA(idx) {
+    if (!estatisticas?.frequencia) return;
+    const sorted = Object.entries(estatisticas.frequencia).map(([n,f])=>({numero:parseInt(n),freq:f})).sort((a,b)=>b.freq-a.freq);
+    const est = rankingEstrategias[0]||ESTRATEGIAS[0];
+    const numeros = gerarPrevisaoPorEstrategia(sorted, est.id, Date.now());
+    meusJogos[idx].numeros = numeros;
+    renderizarMeusJogos();
+    showToast('Jogo atualizado com sugestão IA!','success');
+}
+
+function removerJogo(idx) { meusJogos.splice(idx,1); renderizarMeusJogos(); }
+
+function simularConcurso() {
+    const num = parseInt(document.getElementById('simConcurso').value);
+    if (!num) { showToast('Digite o número do concurso','warning'); return; }
+    const concurso = historicoSorteios.find(h=>(h.concurso||h.id||0)===num);
+    const c = document.getElementById('simResultado');
+    c.classList.remove('hidden');
+    if (!concurso) {
+        c.innerHTML = `<div class="p-4 bg-amber-500/10 rounded-xl border border-amber-500/30"><p class="text-amber-400 text-sm"><i class="fas fa-info-circle mr-2"></i>Concurso #${num} não encontrado no histórico.</p></div>`;
+        return;
+    }
+    const resultados = meusJogos.map(j=>({jogo:j.numeros, acertos:calcularAcertos(j.numeros,concurso.numeros)}));
+    c.innerHTML = `
+        <div class="p-4 bg-slate-800/50 rounded-xl">
+            <h4 class="font-bold mb-3 text-emerald-400">Resultado Concurso #${num}</h4>
+            <div class="flex gap-2 mb-4 flex-wrap">${concurso.numeros.map(n=>`<span class="w-9 h-9 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold">${n}</span>`).join('')}</div>
+            ${resultados.length>0?`<h4 class="font-bold mb-2 text-slate-300">Seus Jogos:</h4>${resultados.map((r,i)=>`<div class="flex items-center justify-between p-2 bg-slate-700/50 rounded-lg mb-1"><div class="flex gap-1">${r.jogo.map(n=>`<span class="w-7 h-7 rounded-full ${concurso.numeros.includes(n)?'bg-amber-500 text-slate-900':'bg-slate-600 text-slate-300'} flex items-center justify-center text-xs font-bold">${n}</span>`).join('')}</div><span class="font-bold ${r.acertos>=4?'text-emerald-400':r.acertos>=2?'text-amber-400':'text-slate-400'}">${r.acertos} acertos</span></div>`).join('')}`:'<p class="text-slate-500 text-sm">Adicione jogos para comparar</p>'}
+        </div>`;
+}
+
+// ============================================================
+// GESTÃO DE CONCURSOS
+// ============================================================
+function abrirModalConcurso(id) {
+    const modal = document.getElementById('modalConcurso');
+    document.getElementById('tituloModalConcurso').textContent = id ? 'Editar Concurso' : 'Novo Concurso';
+    document.getElementById('concursoId').value = id||'';
+    if (id) {
+        const c = concursosCustomizados.find(x=>x.id===id);
+        if (c) {
+            document.getElementById('concursoNumero').value = c.concurso||c.id;
+            document.getElementById('concursoData').value = c.data?.split('T')[0]||'';
+            const inputs = document.querySelectorAll('.concurso-numero');
+            c.numeros.forEach((n,i)=>{ if(inputs[i]) inputs[i].value=n; });
+        }
+    } else {
+        document.getElementById('formConcurso').reset();
+    }
+    modal.classList.add('active');
+}
+
+function fecharModalConcurso(e) {
+    if (!e || e.target===document.getElementById('modalConcurso')) document.getElementById('modalConcurso').classList.remove('active');
+}
+
+function salvarConcurso(e) {
+    e.preventDefault();
+    const inputs = document.querySelectorAll('.concurso-numero');
+    const numeros = Array.from(inputs).map(i=>parseInt(i.value)).filter(n=>!isNaN(n)&&n>=1&&n<=60);
+    if (numeros.length!==6) { showToast('Digite exatamente 6 números válidos','error'); return; }
+    const id = document.getElementById('concursoId').value;
+    const concurso = { id:id||Date.now(), concurso:parseInt(document.getElementById('concursoNumero').value), data:document.getElementById('concursoData').value, numeros:numeros.sort((a,b)=>a-b) };
+    if (id) { const idx=concursosCustomizados.findIndex(x=>x.id==id); if(idx>=0) concursosCustomizados[idx]=concurso; }
+    else concursosCustomizados.push(concurso);
+    localStorage.setItem('megaSenaPro_concursos', JSON.stringify(concursosCustomizados));
+    fecharModalConcurso();
+    renderizarConcursosCustom();
+    showToast('Concurso salvo com sucesso!','success');
+}
+
+function renderizarConcursosCustom() {
+    const c = document.getElementById('listaConcursosCustom');
+    if (concursosCustomizados.length===0) { c.innerHTML='<div class="text-center text-slate-500 text-sm py-4">Nenhum concurso customizado adicionado</div>'; return; }
+    c.innerHTML = concursosCustomizados.sort((a,b)=>(b.concurso||b.id||0)-(a.concurso||a.id||0)).map(x=>`
+        <div class="flex items-center justify-between p-3 bg-slate-800/50 rounded-xl border border-slate-700">
+            <div class="flex items-center gap-3">
+                <span class="font-mono text-indigo-400 text-sm">#${x.concurso||x.id}</span>
+                <div class="flex gap-1">${x.numeros.map(n=>`<span class="w-7 h-7 rounded-full bg-emerald-600/30 text-emerald-300 flex items-center justify-center text-xs font-bold">${n}</span>`).join('')}</div>
+                <span class="text-xs text-slate-500">${formatarData(x.data)}</span>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="abrirModalConcurso('${x.id}')" class="text-amber-400 hover:text-amber-300 text-xs"><i class="fas fa-edit"></i></button>
+                <button onclick="excluirConcurso('${x.id}')" class="text-red-400 hover:text-red-300 text-xs"><i class="fas fa-trash"></i></button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function excluirConcurso(id) {
+    if (!confirm('Excluir este concurso?')) return;
+    concursosCustomizados = concursosCustomizados.filter(x=>String(x.id)!==String(id));
+    localStorage.setItem('megaSenaPro_concursos', JSON.stringify(concursosCustomizados));
+    renderizarConcursosCustom();
+    showToast('Concurso excluído','info');
+}
+
+function exportarDados() {
+    const dados = { historicoSugestoesIA, concursosCustomizados, conhecimentoEstrategias, rankingEstrategias, exportadoEm:new Date().toISOString() };
+    const blob = new Blob([JSON.stringify(dados,null,2)],{type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href=url; a.download=`megasena-backup-${new Date().toISOString().split('T')[0]}.json`;
+    a.click(); URL.revokeObjectURL(url);
+    showToast('Dados exportados com sucesso!','success');
+}
+
+function limparDados() {
+    if (!confirm('Limpar todos os dados de IA? (Histórico de sorteios não será afetado)')) return;
+    historicoSugestoesIA=[]; rankingEstrategias=[]; conhecimentoEstrategias={}; resultadosPorEstrategia={}; geracaoTreinamento=0;
+    localStorage.removeItem('megaSenaPro_sugestoesIA'); localStorage.removeItem('megaSenaPro_conhecimento'); localStorage.removeItem('megaSenaPro_sugestoesProximo');
+    atualizarStatusIA(); mostrarPreviewEstrategias();
+    showToast('Dados de IA limpos. Sistema reiniciado.','warning');
+}
+
+// ============================================================
+// DETALHES DO NÚMERO
+// ============================================================
+function showNumberDetail(num) {
+    const modal = document.getElementById('numberModal');
+    document.getElementById('numberModalTitle').textContent = `Detalhes do Número ${num}`;
+    const freq = estatisticas?.frequencia?.[num]||0;
+    const atraso = estatisticas?.atraso?.[num]||0;
+    const temp = getNumberTemperature(num);
+    const tempText = temp==='hot'?'🔥 Quente':temp==='cold'?'🥶 Frio':'⚡ Neutro';
+    const tempColor = temp==='hot'?'text-red-400':temp==='cold'?'text-blue-400':'text-amber-400';
+    document.getElementById('numberModalContent').innerHTML = `
+        <div class="text-center mb-5">
+            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full text-3xl font-bold mb-3 ${temp==='hot'?'bg-gradient-to-br from-red-500 to-red-600 text-white':temp==='cold'?'bg-gradient-to-br from-blue-500 to-blue-600 text-white':'bg-gradient-to-br from-amber-400 to-amber-500 text-slate-900'}">${num}</div>
+            <div class="text-base ${tempColor} font-semibold">${tempText}</div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+            <div class="bg-slate-800/50 rounded-xl p-3 text-center"><div class="text-2xl font-bold text-emerald-400">${freq}</div><div class="text-xs text-slate-400">Vezes sorteado</div></div>
+            <div class="bg-slate-800/50 rounded-xl p-3 text-center"><div class="text-2xl font-bold text-indigo-400">${totalSorteios>0?((freq/totalSorteios)*100).toFixed(1):'0.0'}%</div><div class="text-xs text-slate-400">Frequência</div></div>
+            <div class="bg-slate-800/50 rounded-xl p-3 text-center"><div class="text-2xl font-bold text-amber-400">${atraso}</div><div class="text-xs text-slate-400">Concursos sem sair</div></div>
+            <div class="bg-slate-800/50 rounded-xl p-3 text-center"><div class="text-2xl font-bold text-purple-400">${Math.ceil(num/10)*10-9}-${Math.ceil(num/10)*10}</div><div class="text-xs text-slate-400">Dezena</div></div>
+        </div>`;
+    modal.classList.add('active');
+}
+
+function closeNumberDetail(e) { if(!e||e.target===document.getElementById('numberModal')) document.getElementById('numberModal').classList.remove('active'); }
+
+// ============================================================
+// DETALHES DO CONCURSO (Histórico)
+// ============================================================
+function verDetalhesConcurso(cId) {
+    const c = [...historicoSorteios,...concursosCustomizados].find(x=>(x.concurso||x.id||0)===cId);
+    if (!c) return;
+    const sug = historicoSugestoesIA.find(s=>s.concursoId===cId);
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay active';
+    modal.innerHTML = `
+        <div class="modal-content max-w-lg" onclick="event.stopPropagation()">
+            <div class="flex items-center justify-between mb-5">
+                <h3 class="text-xl font-bold gradient-text">Concurso #${cId}</h3>
+                <button onclick="this.closest('.modal-overlay').remove()" class="text-slate-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <div class="space-y-4">
+                <div class="p-4 bg-slate-800/50 rounded-xl">
+                    <p class="text-xs text-slate-400 mb-2">Resultado Oficial</p>
+                    <div class="flex gap-2 flex-wrap">${c.numeros.map(n=>`<span class="w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold text-sm">${n}</span>`).join('')}</div>
+                    <p class="text-xs text-slate-500 mt-2">${formatarData(c.data)}</p>
+                </div>
+                ${sug?`
+                <div class="p-4 bg-indigo-500/10 rounded-xl border border-indigo-500/30">
+                    <p class="text-xs text-slate-400 mb-2">Sugestão IA (${sug.estrategia}) • G${sug.geracao}</p>
+                    <div class="flex gap-2 flex-wrap">${sug.numeros.map(n=>`<span class="w-10 h-10 rounded-full ${c.numeros.includes(n)?'bg-amber-500 text-slate-900':'bg-indigo-600/50 text-indigo-300'} flex items-center justify-center font-bold text-sm">${n}</span>`).join('')}</div>
+                    <div class="mt-3 flex items-center gap-2">
+                        <span class="acertos-badge acertos-${Math.min(sug.acertos,6)} text-sm px-3 py-1">${sug.acertos} acertos</span>
+                        ${sug.acertos>=4?'<span class="text-emerald-400 text-sm font-bold">🎉 Excelente!</span>':sug.acertos>=2?'<span class="text-amber-400 text-sm">Bom resultado</span>':''}
+                    </div>
+                </div>`:'<div class="p-4 bg-slate-800/50 rounded-xl text-center text-slate-500 text-sm">Sem sugestão IA para este concurso</div>'}
+                <button onclick="regenerarSugestao(${cId}); this.closest('.modal-overlay').remove();" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm transition"><i class="fas fa-sync mr-2"></i>Regenerar Sugestão IA</button>
+            </div>
+        </div>`;
+    modal.onclick = e => { if(e.target===modal) modal.remove(); };
+    document.body.appendChild(modal);
+}
+
+// ============================================================
+// MODAIS AUXILIARES
+// ============================================================
+function showHelp() { document.getElementById('helpModal').classList.add('active'); }
+function closeHelp(e) { if(!e||e.target===document.getElementById('helpModal')) document.getElementById('helpModal').classList.remove('active'); }
+
+// ============================================================
+// UTILITÁRIOS
+// ============================================================
+function formatarData(data) {
+    if (!data) return '-';
+    try { return new Date(data).toLocaleDateString('pt-BR'); } catch(e) { return data; }
+}
+
+// ============================================================
+// ATALHOS DE TECLADO
+// ============================================================
+document.addEventListener('keydown', e => {
+    if (e.target.tagName==='INPUT') return;
+    if (e.ctrlKey) {
+        switch(e.key) {
+            case '1': e.preventDefault(); showTab('dashboard'); break;
+            case '2': e.preventDefault(); showTab('proximo'); break;
+            case '3': e.preventDefault(); showTab('historico'); break;
+            case '4': e.preventDefault(); showTab('treinamento'); break;
+            case '5': e.preventDefault(); showTab('globo'); break;
+            case '6': e.preventDefault(); showTab('simulador'); break;
+            case 't': e.preventDefault(); toggleTreinamentoContinuo(); break;
+            case 'g': e.preventDefault(); gerarSugestaoProximoJogo(); break;
+            case 'd': e.preventDefault(); toggleTheme(); break;
+        }
+    } else if (e.key==='?') showHelp();
+});
+
+// ============================================================
+// SINCRONIZAÇÃO PERIÓDICA
+// ============================================================
+setInterval(async () => {
+    if (rankingEstrategias.length > 0) await salvarConhecimentoServidor();
+}, 30000);
+
+// ============================================================
+// INICIAR
+// ============================================================
+window.addEventListener('DOMContentLoaded', iniciarSistema);
+</script>
+</body>
+</html>
