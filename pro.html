@@ -1574,8 +1574,7 @@ function toggleTreinamentoContinuo() {
     if (treinamentoContinuoAtivo) {
         treinamentoContinuoAtivo=false; clearInterval(intervaloTreinamento);
         document.getElementById('statusTreinamentoContinuo').classList.add('hidden');
-        document.getElementById('btnTreinamentoContinuo').innerHTML='<i class="fas fa-infinity"></i><span>Treinamento Cont
-ínuo</span>';
+        document.getElementById('btnTreinamentoContinuo').innerHTML='<i class="fas fa-infinity"></i><span>Treinamento Contínuo</span>';
         atualizarStatusIA();
         showToast('Treinamento contínuo pausado','info');
     } else {
