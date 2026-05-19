@@ -977,12 +977,39 @@ async function carregarDados() {
             const dados = await r.json();
             if (Array.isArray(dados) && dados.length > 0) {
                 historicoSorteios = dados;
-                totalSorteios = dados.length;
             }
         }
     } catch(e) { console.error('Erro ao carregar concursos.json:', e); }
+
+    // Carregar concursos customizados do servidor (Prioridade)
+    try {
+        const r = await fetch('/api/carregar-concursos');
+        if (r.ok) {
+            const res = await r.json();
+            if (res.sucesso && Array.isArray(res.dados) && res.dados.length > 0) {
+                concursosCustomizados = res.dados;
+                localStorage.setItem('megaSenaPro_concursos', JSON.stringify(concursosCustomizados));
+            }
+        }
+    } catch(e) { console.warn('Servidor offline, usando localStorage para concursos customizados'); }
+
     if (historicoSorteios.length === 0) gerarDadosSimulados();
+    
+    // Mesclar histórico oficial com customizados
+    // Evitar duplicatas por número de concurso
+    const idsExistentes = new Set(historicoSorteios.map(h => h.concurso || h.id));
+    concursosCustomizados.forEach(c => {
+        const id = c.concurso || c.id;
+        if (!idsExistentes.has(id)) {
+            historicoSorteios.push(c);
+            idsExistentes.add(id);
+        }
+    });
+    historicoSorteios.sort((a,b) => (a.concurso||a.id||0) - (b.concurso||b.id||0));
+    
+    totalSorteios = historicoSorteios.length;
     calcularEstatisticas();
+    
     const ultimoConcurso = Math.max.apply(null, historicoSorteios.map(function(h){return h.concurso||h.id||0;}));
     const proximoConcurso = ultimoConcurso + 1;
     document.getElementById('totalSorteiosHeader').textContent = totalSorteios;
@@ -990,6 +1017,16 @@ async function carregarDados() {
     document.getElementById('headerProximoConcurso').textContent = proximoConcurso;
     document.getElementById('proximoConcursoNum').textContent = proximoConcurso;
     document.getElementById('lastUpdate').textContent = 'Atualizado: ' + new Date().toLocaleTimeString('pt-BR');
+}
+
+async function salvarConcursosServidor() {
+    try {
+        await fetch('/api/salvar-concursos', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(concursosCustomizados)
+        });
+    } catch(e) { console.error('Erro ao salvar concursos no servidor:', e); }
 }
 
 function gerarDadosSimulados() {
@@ -1596,6 +1633,11 @@ async function salvarNovoResultadoAutomatico() {
     totalSorteios = historicoSorteios.length;
     ultimoResultadoInputado = novoResultado;
     localStorage.setItem('megaSenaPro_ultimoResultado', JSON.stringify(novoResultado));
+    
+    // Sincronizar com concursos customizados para persistência no servidor
+    concursosCustomizados.push(novoResultado);
+    localStorage.setItem('megaSenaPro_concursos', JSON.stringify(concursosCustomizados));
+    salvarConcursosServidor();
 
     // 2. Recalcular estatísticas
     calcularEstatisticas();
@@ -2565,6 +2607,7 @@ function salvarConcurso(e) {
     nums.sort(function(a,b){return a-b;});
     concursosCustomizados.push({ concurso:numero, numeros:nums, data:data });
     localStorage.setItem('megaSenaPro_concursos', JSON.stringify(concursosCustomizados));
+    salvarConcursosServidor();
     fecharModalConcurso();
     renderizarConcursosCustom();
     showToast('Concurso #' + numero + ' adicionado!', 'success');
@@ -2573,6 +2616,7 @@ function salvarConcurso(e) {
 function removerConcursoCustom(idx) {
     concursosCustomizados.splice(idx, 1);
     localStorage.setItem('megaSenaPro_concursos', JSON.stringify(concursosCustomizados));
+    salvarConcursosServidor();
     renderizarConcursosCustom();
     showToast('Concurso removido', 'info');
 }
@@ -2685,7 +2729,31 @@ document.addEventListener('keydown', function(e) {
 // ============================================================
 // INICIALIZAR
 // ============================================================
-window.addEventListener('load', iniciarSistema);
+window.addEventListener('load', function() {
+    iniciarSistema();
+    
+    // Delegação de eventos para botões dinâmicos
+    document.addEventListener('click', function(e) {
+        // Botão Realtime (Histórico IA)
+        if (e.target && (e.target.id === 'btnProcessarRealtime' || e.target.closest('#btnProcessarRealtime'))) {
+            if (typeof iniciarProcessamentoHistoricoRealtime === 'function') {
+                iniciarProcessamentoHistoricoRealtime();
+            }
+        }
+        
+        // Botão Auto Sugestão (Próximo Jogo)
+        if (e.target && (e.target.id === 'btnAutoSugestao' || e.target.closest('#btnAutoSugestao'))) {
+            if (typeof toggleAutoSugestao === 'function') {
+                toggleAutoSugestao();
+            }
+        }
+    });
+
+    // Aplicar a nova UI intuitiva
+    if (typeof aplicarNovaUI === 'function') {
+        aplicarNovaUI();
+    }
+});
 </script>
 </body>
 </html>

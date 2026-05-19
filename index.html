@@ -2752,29 +2752,27 @@ window.addEventListener('load', function() {
     iniciarSistema();
     
     // Vincular eventos dos novos módulos após o carregamento do sistema
-    const btnRealtime = document.getElementById('btnProcessarRealtime');
-    if (btnRealtime) {
-        btnRealtime.addEventListener('click', function() {
+    // Botão Realtime pode estar na aba Histórico IA
+    document.addEventListener('click', function(e) {
+        if (e.target && (e.target.id === 'btnProcessarRealtime' || e.target.closest('#btnProcessarRealtime'))) {
             if (typeof iniciarProcessamentoHistoricoRealtime === 'function') {
                 iniciarProcessamentoHistoricoRealtime();
             } else {
                 console.error('Função iniciarProcessamentoHistoricoRealtime não encontrada!');
                 showToast('Erro: Módulo de performance não carregado corretamente.', 'error');
             }
-        });
-    }
-
-    const btnAuto = document.getElementById('btnAutoSugestao');
-    if (btnAuto) {
-        btnAuto.addEventListener('click', function() {
+        }
+        
+        // Botão Auto Sugestão
+        if (e.target && (e.target.id === 'btnAutoSugestao' || e.target.closest('#btnAutoSugestao'))) {
             if (typeof toggleAutoSugestao === 'function') {
                 toggleAutoSugestao();
             } else {
                 console.error('Função toggleAutoSugestao não encontrada!');
                 showToast('Erro: Módulo de automação não carregado corretamente.', 'error');
             }
-        });
-    }
+        }
+    });
 
     // Aplicar a nova UI intuitiva
     if (typeof aplicarNovaUI === 'function') {

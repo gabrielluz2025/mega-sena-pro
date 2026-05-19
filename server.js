@@ -36,7 +36,8 @@ const ARQUIVOS = {
     simulacoes: path.join(DATA_DIR, 'simulacoes.json'),
     configuracoes: path.join(DATA_DIR, 'configuracoes.json'),
     previsoes: path.join(DATA_DIR, 'previsoes.json'), // 🎯 Histórico de previsões
-    checkpoint: path.join(DATA_DIR, 'checkpoint.json') // 💾 Checkpoint do treinamento
+    checkpoint: path.join(DATA_DIR, 'checkpoint.json'), // 💾 Checkpoint do treinamento
+    concursos: path.join(DATA_DIR, 'concursos_custom.json') // 📝 Concursos adicionados pelo usuário
 };
 
 // Endpoint: Salvar melhor IA
@@ -228,6 +229,27 @@ app.delete('/api/apagar-checkpoint', async (req, res) => {
     }
 });
 
+// Endpoint: Salvar concursos customizados
+app.post('/api/salvar-concursos', async (req, res) => {
+    try {
+        await ensureDataDir();
+        await fs.writeFile(ARQUIVOS.concursos, JSON.stringify(req.body, null, 2));
+        res.json({ sucesso: true });
+    } catch (erro) {
+        res.status(500).json({ sucesso: false, erro: erro.message });
+    }
+});
+
+// Endpoint: Carregar concursos customizados
+app.get('/api/carregar-concursos', async (req, res) => {
+    try {
+        const dados = await fs.readFile(ARQUIVOS.concursos, 'utf8').then(JSON.parse).catch(() => []);
+        res.json({ sucesso: true, dados });
+    } catch {
+        res.json({ sucesso: false, dados: [] });
+    }
+});
+
 // Endpoint: Backup completo
 app.post('/api/backup', async (req, res) => {
     try {
@@ -340,6 +362,8 @@ app.listen(PORT, async () => {
     console.log('  GET  /api/carregar-previsoes  - Carregar previsoes');
     console.log('  POST /api/salvar-checkpoint   - Salvar checkpoint');
     console.log('  GET  /api/carregar-checkpoint - Carregar checkpoint');
+    console.log('  POST /api/salvar-concursos    - Salvar concursos');
+    console.log('  GET  /api/carregar-concursos  - Carregar concursos');
     console.log('  GET  /api/existe-checkpoint   - Verificar checkpoint');
     console.log('  DELETE /api/apagar-checkpoint - Apagar checkpoint');
     console.log('  POST /api/backup              - Criar backup');

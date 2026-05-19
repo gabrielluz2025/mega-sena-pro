@@ -8,8 +8,15 @@
 // ============================================================
 
 function renderizarDashboardVisaoAguia() {
+    console.log('📊 Renderizando Dashboard Visão de Águia...');
     const container = document.getElementById('tab-dashboard');
     if (!container) return;
+
+    // Garantir que as estatísticas base estão atualizadas
+    if (typeof calcularEstatisticas === 'function') {
+        console.log('📈 Recalculando estatísticas para o dashboard...');
+        calcularEstatisticas();
+    }
 
     // Calcular dados simplificados
     const stats = calcularEstatisticasAvancadas();
