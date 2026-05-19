@@ -13,6 +13,13 @@ function renderizarDashboardVisaoAguia() {
 
     // Calcular dados simplificados
     const stats = calcularEstatisticasAvancadas();
+    
+    // Calcular tendência (0 a 1) baseada nos últimos acertos
+    const ultimosAcertos = historicoSugestoesIA.slice(-10).map(s => s.acertos);
+    const mediaRecente = ultimosAcertos.length > 0 ? ultimosAcertos.reduce((a,b) => a+b, 0) / ultimosAcertos.length : 0;
+    const tendencia = Math.min(1, mediaRecente / 4); // 4 acertos = 100% quente
+    const tendenciaPerc = Math.round(tendencia * 100);
+
     const quentes = Object.entries(estatisticas.frequencia)
         .sort((a, b) => b[1] - a[1])
         .slice(0, 6)
@@ -32,23 +39,26 @@ function renderizarDashboardVisaoAguia() {
 
             <!-- CARDS PRINCIPAIS -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <!-- Termômetro de Sorte -->
-                <div class="glass p-5 rounded-2xl border-b-4 border-orange-500">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-10 h-10 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-500">
-                            <i class="fas fa-thermometer-half"></i>
+                <!-- Termômetro de Sorte (Gauge Style) -->
+                <div class="glass p-5 rounded-2xl border-b-4 border-orange-500 flex flex-col items-center text-center">
+                    <div class="flex items-center gap-3 mb-2 w-full text-left">
+                        <div class="w-8 h-8 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-500">
+                            <i class="fas fa-fire"></i>
                         </div>
                         <div>
-                            <h3 class="text-sm font-bold">Termômetro de Sorte</h3>
-                            <p class="text-[10px] text-slate-400">Tendência atual do sistema</p>
+                            <h3 class="text-xs font-bold">Termômetro de Sorte</h3>
                         </div>
                     </div>
-                    <div class="relative h-4 bg-slate-800 rounded-full overflow-hidden mb-2">
-                        <div class="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-500 via-yellow-500 to-red-500" style="width: 75%"></div>
+                    
+                    <div class="relative w-32 h-16 overflow-hidden mt-2">
+                        <div class="absolute top-0 left-0 w-32 h-32 border-[12px] border-slate-800 rounded-full"></div>
+                        <div class="absolute top-0 left-0 w-32 h-32 border-[12px] border-transparent border-t-orange-500 border-r-orange-500 rounded-full rotate-[45deg] transition-transform duration-1000" id="gaugePointer" style="transform: rotate(calc(-135deg + (180deg * ${tendencia})));"></div>
+                        <div class="absolute bottom-0 left-1/2 -translate-x-1/2 text-lg font-bold text-white" id="gaugeValue">${tendenciaPerc}%</div>
                     </div>
-                    <div class="flex justify-between text-[10px] font-bold">
+                    
+                    <div class="flex justify-between w-full text-[9px] font-bold mt-1 px-2">
                         <span class="text-blue-400">FRIO</span>
-                        <span class="text-red-500">QUENTE 🔥</span>
+                        <span class="text-red-500">QUENTE</span>
                     </div>
                 </div>
 
