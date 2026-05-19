@@ -326,13 +326,40 @@
             <div class="flex items-center justify-between mb-5">
                 <h2 class="text-2xl font-bold gradient-text-blue">🔬 Histórico de Concursos com IA</h2>
                 <div class="flex items-center gap-2">
-                    <div id="statusGeracaoRetroativa" class="hidden ai-badge learning">
-                        <i class="fas fa-robot animate-spin text-xs"></i>
-                        <span id="textoGeracaoRetroativa">Gerando...</span>
-                    </div>
-                    <button onclick="gerarSugestoesRetroativas()" id="btnGerarRetroativas" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl transition flex items-center gap-2 text-sm">
-                        <i class="fas fa-magic"></i><span>Gerar Sugestões p/ Todos</span>
+                    <button onclick="iniciarProcessamentoHistoricoRealtime()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl transition flex items-center gap-2 text-sm">
+                        <i class="fas fa-play"></i><span>Processar Realtime</span>
                     </button>
+                    <button onclick="gerarSugestoesRetroativas()" id="btnGerarRetroativas" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl transition flex items-center gap-2 text-sm">
+                        <i class="fas fa-magic"></i><span>Gerar Todos</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- PAINEL DE PERFORMANCE REALTIME -->
+            <div class="grid grid-cols-2 md:grid-cols-6 gap-3 mb-6">
+                <div class="stat-card p-3 border-b-2 border-indigo-500">
+                    <p class="text-[10px] text-slate-400 uppercase">Processados</p>
+                    <p class="text-xl font-bold font-mono text-indigo-400" id="totalProcessadoRealtime">0</p>
+                </div>
+                <div class="stat-card p-3 border-b-2 border-emerald-500">
+                    <p class="text-[10px] text-slate-400 uppercase">Acertos Totais</p>
+                    <p class="text-xl font-bold font-mono text-emerald-400" id="totalAcertosRealtime">0</p>
+                </div>
+                <div class="stat-card p-3 border-b-2 border-amber-500">
+                    <p class="text-[10px] text-slate-400 uppercase">Taxa Sucesso</p>
+                    <p class="text-xl font-bold font-mono text-amber-400" id="taxaSucessoRealtime">0%</p>
+                </div>
+                <div class="stat-card p-3 border-b-2 border-gold-500">
+                    <p class="text-[10px] text-slate-400 uppercase">Senas</p>
+                    <p class="text-xl font-bold font-mono text-yellow-400" id="totalSenasRealtime">0</p>
+                </div>
+                <div class="stat-card p-3 border-b-2 border-purple-500">
+                    <p class="text-[10px] text-slate-400 uppercase">Quinas</p>
+                    <p class="text-xl font-bold font-mono text-purple-400" id="totalQuinasRealtime">0</p>
+                </div>
+                <div class="stat-card p-3 border-b-2 border-blue-500">
+                    <p class="text-[10px] text-slate-400 uppercase">Quadras</p>
+                    <p class="text-xl font-bold font-mono text-blue-400" id="totalQuadrasRealtime">0</p>
                 </div>
             </div>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-5">
@@ -2738,5 +2765,8 @@ window.addEventListener('load', iniciarSistema);
 
 <!-- ✅ MÓDULO DE CONFERIDOR MELHORADO -->
 <script src="conferidor-melhorado.js"></script>
+
+<!-- ⚡ MÓDULO DE AUTOMAÇÃO E PERFORMANCE IA -->
+<script src="ia-automacao-performance.js"></script>
 </body>
 </html>
