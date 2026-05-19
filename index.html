@@ -266,7 +266,7 @@
             <div class="flex items-center justify-between mb-5">
                 <h2 class="text-2xl font-bold gradient-text">👑 Próximo Jogo — Concurso #<span id="proximoConcursoNum">-</span></h2>
                 <div class="flex items-center gap-2">
-                    <button onclick="toggleAutoSugestao()" id="btnAutoSugestao" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl transition flex items-center gap-2 text-sm">
+                    <button id="btnAutoSugestao" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl transition flex items-center gap-2 text-sm">
                         <i class="fas fa-play" id="iconAutoSugestao"></i><span id="textAutoSugestao">Auto: OFF</span>
                     </button>
                     <button onclick="gerarSugestaoProximoJogo()" class="px-4 py-2 bg-pink-600 hover:bg-pink-500 text-white rounded-xl transition flex items-center gap-2 text-sm">
@@ -326,7 +326,7 @@
             <div class="flex items-center justify-between mb-5">
                 <h2 class="text-2xl font-bold gradient-text-blue">🔬 Histórico de Concursos com IA</h2>
                 <div class="flex items-center gap-2">
-                    <button onclick="iniciarProcessamentoHistoricoRealtime()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl transition flex items-center gap-2 text-sm">
+                    <button id="btnProcessarRealtime" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl transition flex items-center gap-2 text-sm">
                         <i class="fas fa-play"></i><span>Processar Realtime</span>
                     </button>
                     <button onclick="gerarSugestoesRetroativas()" id="btnGerarRetroativas" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl transition flex items-center gap-2 text-sm">
@@ -2748,7 +2748,34 @@ document.addEventListener('keydown', function(e) {
 // ============================================================
 // INICIALIZAR
 // ============================================================
-window.addEventListener('load', iniciarSistema);
+window.addEventListener('load', function() {
+    iniciarSistema();
+    
+    // Vincular eventos dos novos módulos após o carregamento do sistema
+    const btnRealtime = document.getElementById('btnProcessarRealtime');
+    if (btnRealtime) {
+        btnRealtime.addEventListener('click', function() {
+            if (typeof iniciarProcessamentoHistoricoRealtime === 'function') {
+                iniciarProcessamentoHistoricoRealtime();
+            } else {
+                console.error('Função iniciarProcessamentoHistoricoRealtime não encontrada!');
+                showToast('Erro: Módulo de performance não carregado corretamente.', 'error');
+            }
+        });
+    }
+
+    const btnAuto = document.getElementById('btnAutoSugestao');
+    if (btnAuto) {
+        btnAuto.addEventListener('click', function() {
+            if (typeof toggleAutoSugestao === 'function') {
+                toggleAutoSugestao();
+            } else {
+                console.error('Função toggleAutoSugestao não encontrada!');
+                showToast('Erro: Módulo de automação não carregado corretamente.', 'error');
+            }
+        });
+    }
+});
 </script>
 
 <!-- 💾 MÓDULO DE PERSISTÊNCIA MELHORADA -->
