@@ -1,0 +1,66 @@
+============================================
+GUIA MANUAL - SUBIR PARA GITHUB
+============================================
+
+Se os scripts estão fechando sozinhos, siga estes passos:
+
+1. ABRA O TERMINAL:
+   - Pressione: Windows + R
+   - Digite: cmd
+   - Pressione ENTER
+
+2. NAVEGUE ATÉ A PASTA:
+   cd "C:\Users\xgame\Downloads\MEGA SENA"
+
+3. VERIFIQUE O GIT:
+   git --version
+   (Deve mostrar a versão do git)
+
+4. CONFIGURE O GIT (se necessário):
+   git config --global user.email "seu@email.com"
+   git config --global user.name "Seu Nome"
+
+5. VERIFIQUE SE TEM REMOTE:
+   git remote -v
+   
+   Se NÃO mostrar nada, configure:
+   git remote add origin https://github.com/SEU_USUARIO/mega-sena-pro.git
+
+6. ADICIONE OS ARQUIVOS:
+   git add pro.html
+   git add server.js
+   git add data.json
+   git add concursos.json
+   git add package.json
+   git add render.yaml
+   git add .gitignore
+
+7. CRIE O COMMIT:
+   git commit -m "Mega Sena PRO v2 - Sistema Unificado"
+
+8. ENVIE PARA GITHUB:
+   git push origin main
+   
+   Se der erro, tente:
+   git push origin master
+
+9. PRONTO!
+   Aguarde o Render.com atualizar automaticamente.
+
+============================================
+SOLUÇÃO DE PROBLEMAS
+============================================
+
+PROBLEMA: "fatal: not a git repository"
+SOLUÇÃO: Execute primeiro: git init
+
+PROBLEMA: "fatal: unable to access"
+SOLUÇÃO: Verifique sua conexão com internet
+
+PROBLEMA: "Authentication failed"
+SOLUÇÃO: Configure token do GitHub ou faça login
+
+PROBLEMA: "rejected - non-fast-forward"
+SOLUÇÃO: Execute primeiro: git pull origin main
+
+============================================

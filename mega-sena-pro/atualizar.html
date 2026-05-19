@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atualizar Resultados - Mega Sena</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-900 via-indigo-900 to-purple-900 min-h-screen text-white">
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold mb-2">🔄 Atualizar Resultados</h1>
+            <p class="text-blue-200">Adicione os últimos sorteios da Mega Sena ao sistema</p>
+        </header>
+
+        <!-- Status atual -->
+        <div class="bg-white/10 backdrop-blur rounded-xl p-6 mb-6">
+            <h2 class="text-xl font-bold mb-4">📊 Status Atual do Sistema</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-white/20 rounded-lg p-4 text-center">
+                    <div class="text-3xl font-bold text-yellow-400" id="totalSorteios">-</div>
+                    <div class="text-sm text-blue-200">Sorteios no sistema</div>
+                </div>
+                <div class="bg-white/20 rounded-lg p-4 text-center">
+                    <div class="text-3xl font-bold text-green-400" id="ultimoConcurso">-</div>
+                    <div class="text-sm text-blue-200">Último concurso</div>
+                </div>
+                <div class="bg-white/20 rounded-lg p-4 text-center">
+                    <div class="text-3xl font-bold text-pink-400" id="dataUltimo">-</div>
+                    <div class="text-sm text-blue-200">Data do último</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulário para adicionar novo sorteio -->
+        <div class="bg-white rounded-xl shadow-2xl p-6 text-gray-800 mb-6">
+            <h2 class="text-2xl font-bold mb-4 flex items-center">
+                <span class="mr-2">➕</span> Adicionar Novo Sorteio Manualmente
+            </h2>
+            
+            <form id="formNovoSorteio" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Número do Concurso</label>
+                        <input type="number" id="concurso" required 
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                               placeholder="Ex: 3002">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Data do Sorteio</label>
+                        <input type="date" id="dataSorteio" required
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">6 Números Sorteados</label>
+                    <div class="grid grid-cols-6 gap-2">
+                        <input type="number" id="num1" min="1" max="60" required
+                               class="w-full px-2 py-3 text-center text-xl font-bold border-2 border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <input type="number" id="num2" min="1" max="60" required
+                               class="w-full px-2 py-3 text-center text-xl font-bold border-2 border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <input type="number" id="num3" min="1" max="60" required
+                               class="w-full px-2 py-3 text-center text-xl font-bold border-2 border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <input type="number" id="num4" min="1" max="60" required
+                               class="w-full px-2 py-3 text-center text-xl font-bold border-2 border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <input type="number" id="num5" min="1" max="60" required
+                               class="w-full px-2 py-3 text-center text-xl font-bold border-2 border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <input type="number" id="num6" min="1" max="60" required
+                               class="w-full px-2 py-3 text-center text-xl font-bold border-2 border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                </div>
+
+                <div class="flex gap-3 pt-4">
+                    <button type="submit" 
+                            class="flex-1 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-3 px-6 rounded-lg transition transform hover:scale-105">
+                        💾 Salvar Novo Sorteio
+                    </button>
+                    <button type="button" onclick="buscarUltimoOnline()"
+                            class="flex-1 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition transform hover:scale-105">
+                        🌐 Buscar Online
+                    </button>
+                </div>
+            </form>
+
+            <!-- Área de resultado -->
+            <div id="resultado" class="mt-4 hidden">
+                <div class="bg-gray-100 rounded-lg p-4">
+                    <h3 class="font-bold text-gray-800 mb-2">📋 JSON para adicionar ao sistema:</h3>
+                    <pre id="jsonResult" class="bg-gray-800 text-green-400 p-3 rounded text-sm overflow-x-auto"></pre>
+                    <p class="text-xs text-gray-600 mt-2">
+                        💡 Copie este JSON e cole no arquivo <code>data.json</code> ou use o botão acima para baixar
+                    </p>
+                    <button onclick="baixarJSON()" class="mt-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm">
+                        📥 Baixar data.json atualizado
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Instruções -->
+        <div class="bg-white/10 backdrop-blur rounded-xl p-6">
+            <h2 class="text-xl font-bold mb-4">📖 Como Atualizar o Sistema</h2>
+            <div class="space-y-3 text-sm">
+                <div class="flex items-start gap-3">
+                    <span class="bg-blue-500 text-white w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0">1</span>
+                    <p>Adicione o novo sorteio usando o formulário acima (manual) ou clique em "Buscar Online"</p>
+                </div>
+                <div class="flex items-start gap-3">
+                    <span class="bg-blue-500 text-white w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0">2</span>
+                    <p>Copie o JSON gerado ou baixe o arquivo <code>data.json</code></p>
+                </div>
+                <div class="flex items-start gap-3">
+                    <span class="bg-blue-500 text-white w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0">3</span>
+                    <p>Substitua o arquivo <code>data.json</code> na pasta do sistema</p>
+                </div>
+                <div class="flex items-start gap-3">
+                    <span class="bg-blue-500 text-white w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0">4</span>
+                    <p>Recarregue a página <code>index.html</code> para ver as estatísticas atualizadas!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botão voltar -->
+        <div class="text-center mt-6">
+            <a href="index.html" class="inline-block bg-white/20 hover:bg-white/30 text-white font-bold py-3 px-8 rounded-lg transition">
+                ⬅️ Voltar para o Sistema Principal
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Verificar status atual (tentar carregar do data.json se existir)
+        async function verificarStatus() {
+            try {
+                const response = await fetch('data.json');
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('totalSorteios').textContent = data.total_sorteios || '-';
+                    document.getElementById('ultimoConcurso').textContent = data.ultimo_concurso || '-';
+                    document.getElementById('dataUltimo').textContent = new Date().toLocaleDateString() || '-';
+                }
+            } catch (e) {
+                console.log('Nenhum data.json encontrado');
+            }
+        }
+
+        // Buscar último resultado online
+        async function buscarUltimoOnline() {
+            const btn = document.querySelector('button[onclick="buscarUltimoOnline()"]');
+            btn.textContent = '🔍 Buscando...';
+            btn.disabled = true;
+
+            try {
+                // Tentar API da Caixa (pode ter CORS, então tentamos múltiplas fontes)
+                const apis = [
+                    'https://loteriascaixa-api.herokuapp.com/api/mega-sena/latest',
+                    'https://servicebus2.caixa.gov.br/portaldeloterias/api/home/ultimos-resultados'
+                ];
+
+                let dados = null;
+                
+                for (let api of apis) {
+                    try {
+                        const response = await fetch(api, { 
+                            method: 'GET',
+                            headers: { 'Accept': 'application/json' }
+                        });
+                        if (response.ok) {
+                            const data = await response.json();
+                            // Parse conforme a API
+                            if (data.concurso) {
+                                dados = {
+                                    concurso: data.concurso,
+                                    data: data.data,
+                                    numeros: data.dezenas?.map(n => parseInt(n)) || []
+                                };
+                                break;
+                            }
+                        }
+                    } catch (e) {
+                        console.log('API falhou:', e);
+                    }
+                }
+
+                if (dados && dados.numeros.length === 6) {
+                    document.getElementById('concurso').value = dados.concurso;
+                    document.getElementById('dataSorteio').value = converterData(dados.data);
+                    dados.numeros.forEach((num, i) => {
+                        document.getElementById(`num${i+1}`).value = num;
+                    });
+                    alert('✅ Dados carregados com sucesso!');
+                } else {
+                    alert('⚠️ Não foi possível buscar automaticamente. Por favor, insira manualmente.');
+                }
+            } catch (error) {
+                alert('❌ Erro ao buscar: ' + error.message);
+            } finally {
+                btn.textContent = '🌐 Buscar Online';
+                btn.disabled = false;
+            }
+        }
+
+        function converterData(dataStr) {
+            // Converter DD/MM/AAAA para AAAA-MM-DD
+            const partes = dataStr.split('/');
+            if (partes.length === 3) {
+                return `${partes[2]}-${partes[1]}-${partes[0]}`;
+            }
+            return dataStr;
+        }
+
+        // Formulário
+        document.getElementById('formNovoSorteio').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const concurso = document.getElementById('concurso').value;
+            const data = document.getElementById('dataSorteio').value;
+            const numeros = [
+                parseInt(document.getElementById('num1').value),
+                parseInt(document.getElementById('num2').value),
+                parseInt(document.getElementById('num3').value),
+                parseInt(document.getElementById('num4').value),
+                parseInt(document.getElementById('num5').value),
+                parseInt(document.getElementById('num6').value)
+            ].sort((a,b) => a-b);
+
+            // Validar
+            const unicos = [...new Set(numeros)];
+            if (unicos.length !== 6) {
+                alert('❌ Números duplicados! Digite 6 números diferentes.');
+                return;
+            }
+
+            // Criar objeto JSON
+            const novoSorteio = {
+                concurso: parseInt(concurso),
+                data: data,
+                numeros: numeros,
+                timestamp: new Date().toISOString()
+            };
+
+            // Exibir resultado
+            document.getElementById('jsonResult').textContent = JSON.stringify(novoSorteio, null, 2);
+            document.getElementById('resultado').classList.remove('hidden');
+            document.getElementById('resultado').classList.add('fade-in');
+
+            // Salvar no localStorage para uso futuro
+            let sorteios = JSON.parse(localStorage.getItem('megaSenaSorteios') || '[]');
+            sorteios.push(novoSorteio);
+            localStorage.setItem('megaSenaSorteios', JSON.stringify(sorteios));
+
+            alert('✅ Sorteio adicionado! Use o botão "Baixar" para salvar o arquivo.');
+        });
+
+        function baixarJSON() {
+            const sorteios = JSON.parse(localStorage.getItem('megaSenaSorteios') || '[]');
+            const dataStr = JSON.stringify({ 
+                atualizacao: new Date().toISOString(),
+                total_sorteios: sorteios.length,
+                sorteios: sorteios 
+            }, null, 2);
+            
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'data.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Inicializar
+        verificarStatus();
+        
+        // Preencher data de hoje
+        document.getElementById('dataSorteio').valueAsDate = new Date();
+    </script>
+</body>
+</html>

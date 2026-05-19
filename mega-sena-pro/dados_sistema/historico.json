@@ -1,0 +1,146 @@
+[
+  {
+    "nome": "Top 6 Frequentes",
+    "id": "top6",
+    "peso": 1,
+    "desc": "Os 6 números mais sorteados",
+    "mediaAcertos": 0.735,
+    "melhorAcerto": 3
+  },
+  {
+    "nome": "Gap Analysis",
+    "id": "gap",
+    "peso": 1,
+    "desc": "Evita gaps grandes",
+    "mediaAcertos": 0.735,
+    "melhorAcerto": 3
+  },
+  {
+    "nome": "Primalidade",
+    "id": "primos",
+    "peso": 1,
+    "desc": "Números primos estatísticos",
+    "mediaAcertos": 0.735,
+    "melhorAcerto": 3
+  },
+  {
+    "nome": "Análise Temporal",
+    "id": "temporal",
+    "peso": 1,
+    "desc": "Padrões por dia/mês",
+    "mediaAcertos": 0.735,
+    "melhorAcerto": 3
+  },
+  {
+    "nome": "Análise de Dezenas",
+    "id": "dezenas",
+    "peso": 1,
+    "desc": "Equilibra dezenas 1-10, 11-20...",
+    "mediaAcertos": 0.725,
+    "melhorAcerto": 3
+  },
+  {
+    "nome": "Clusterização Espacial",
+    "id": "cluster",
+    "peso": 1,
+    "desc": "Grupos próximos no cartão",
+    "mediaAcertos": 0.72,
+    "melhorAcerto": 3
+  },
+  {
+    "nome": "Clusters Numéricos",
+    "id": "clusters",
+    "peso": 1,
+    "desc": "Grupos consecutivos",
+    "mediaAcertos": 0.72,
+    "melhorAcerto": 3
+  },
+  {
+    "nome": "Paridade Dinâmica",
+    "id": "paridade",
+    "peso": 1,
+    "desc": "Equilibra pares e ímpares",
+    "mediaAcertos": 0.715,
+    "melhorAcerto": 3
+  },
+  {
+    "nome": "Sequência Histórica",
+    "id": "sequencia",
+    "peso": 1,
+    "desc": "Sequências recorrentes",
+    "mediaAcertos": 0.69,
+    "melhorAcerto": 3
+  },
+  {
+    "nome": "Distribuição Geométrica",
+    "id": "geometrica",
+    "peso": 1,
+    "desc": "Distribuição espacial",
+    "mediaAcertos": 0.68,
+    "melhorAcerto": 2
+  },
+  {
+    "nome": "Posição das Bolas",
+    "id": "posicao",
+    "peso": 1,
+    "desc": "Frequência por posição de saída",
+    "mediaAcertos": 0.675,
+    "melhorAcerto": 3
+  },
+  {
+    "nome": "Regressão Estatística",
+    "id": "regressao",
+    "peso": 1,
+    "desc": "Modelo preditivo",
+    "mediaAcertos": 0.66,
+    "melhorAcerto": 3
+  },
+  {
+    "nome": "Fibonacci Ponderado",
+    "id": "fibonacci",
+    "peso": 1,
+    "desc": "Fibonacci + atraso",
+    "mediaAcertos": 0.635,
+    "melhorAcerto": 3
+  },
+  {
+    "nome": "Dígitos Significativos",
+    "id": "digitos",
+    "peso": 1,
+    "desc": "Frequência por dígito",
+    "mediaAcertos": 0.605,
+    "melhorAcerto": 2
+  },
+  {
+    "nome": "Múltiplos Estratégicos",
+    "id": "multiplos",
+    "peso": 1,
+    "desc": "Múltiplos de 3, 7, 11",
+    "mediaAcertos": 0.59,
+    "melhorAcerto": 3
+  },
+  {
+    "nome": "Soma Média Otimizada",
+    "id": "soma",
+    "peso": 1,
+    "desc": "Soma próxima à média (186)",
+    "mediaAcertos": 0.55,
+    "melhorAcerto": 2
+  },
+  {
+    "nome": "Atraso Relativo",
+    "id": "atraso",
+    "peso": 1,
+    "desc": "Atrasados + quentes",
+    "mediaAcertos": 0.525,
+    "melhorAcerto": 4
+  },
+  {
+    "nome": "Ciclo de Atraso",
+    "id": "cicloatraso",
+    "peso": 1,
+    "desc": "Ciclos de atraso",
+    "mediaAcertos": 0.525,
+    "melhorAcerto": 4
+  }
+]

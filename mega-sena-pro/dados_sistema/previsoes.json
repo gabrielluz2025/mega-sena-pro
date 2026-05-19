@@ -1,0 +1,100 @@
+{
+  "historico": [
+    {
+      "estrategia": "Análise Temporal",
+      "estrategiaId": "temporal",
+      "numeros": [
+        5,
+        10,
+        27,
+        32,
+        37,
+        53
+      ],
+      "confianca": 79,
+      "mediaHistorica": 3.829000837866423,
+      "timestamp": "2026-05-19T14:52:34.127Z",
+      "proximoConcurso": 3009,
+      "geracao": 18,
+      "pesoAprendido": 1,
+      "id": 1779202354128
+    },
+    {
+      "estrategia": "Posição das Bolas",
+      "estrategiaId": "posicao",
+      "numeros": [
+        1,
+        13,
+        28,
+        37,
+        46,
+        60
+      ],
+      "confianca": 79,
+      "mediaHistorica": 3.826922810428699,
+      "timestamp": "2026-05-19T14:50:34.124Z",
+      "proximoConcurso": 3009,
+      "geracao": 18,
+      "pesoAprendido": 1,
+      "id": 1779202234125
+    },
+    {
+      "estrategia": "Dígitos Significativos",
+      "estrategiaId": "digitos",
+      "numeros": [
+        4,
+        10,
+        30,
+        33,
+        34,
+        53
+      ],
+      "confianca": 77,
+      "mediaHistorica": 3.428617981800187,
+      "timestamp": "2026-05-19T14:48:34.153Z",
+      "proximoConcurso": 3009,
+      "geracao": 14,
+      "pesoAprendido": 1,
+      "id": 1779202114154
+    },
+    {
+      "estrategia": "Top 6 Frequentes",
+      "estrategiaId": "top6",
+      "numeros": [
+        5,
+        10,
+        27,
+        32,
+        37,
+        53
+      ],
+      "confianca": 71.5,
+      "mediaHistorica": 1.063581103139502,
+      "timestamp": "2026-05-19T14:46:33.405Z",
+      "proximoConcurso": 3009,
+      "geracao": 3,
+      "pesoAprendido": 1,
+      "id": 1779201993406
+    }
+  ],
+  "melhor": {
+    "estrategia": "Análise Temporal",
+    "estrategiaId": "temporal",
+    "numeros": [
+      5,
+      10,
+      27,
+      32,
+      37,
+      53
+    ],
+    "confianca": 79,
+    "mediaHistorica": 3.829000837866423,
+    "timestamp": "2026-05-19T14:52:34.127Z",
+    "proximoConcurso": 3009,
+    "geracao": 18,
+    "pesoAprendido": 1,
+    "id": 1779202354128
+  },
+  "atualizadoEm": "2026-05-19T14:52:57.346Z"
+}

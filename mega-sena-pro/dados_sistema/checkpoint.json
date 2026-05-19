@@ -1,0 +1,252 @@
+{
+  "geracaoAtual": 19,
+  "timestamp": "2026-05-19T14:52:56.837Z",
+  "populacao": [
+    {
+      "nome": "Top 6 Frequentes",
+      "id": "top6",
+      "peso": 1,
+      "desc": "Os 6 números mais sorteados",
+      "mediaAcertos": 0.735,
+      "melhorAcerto": 3
+    },
+    {
+      "nome": "Gap Analysis",
+      "id": "gap",
+      "peso": 1,
+      "desc": "Evita gaps grandes",
+      "mediaAcertos": 0.735,
+      "melhorAcerto": 3
+    },
+    {
+      "nome": "Primalidade",
+      "id": "primos",
+      "peso": 1,
+      "desc": "Números primos estatísticos",
+      "mediaAcertos": 0.735,
+      "melhorAcerto": 3
+    },
+    {
+      "nome": "Análise Temporal",
+      "id": "temporal",
+      "peso": 1,
+      "desc": "Padrões por dia/mês",
+      "mediaAcertos": 0.735,
+      "melhorAcerto": 3
+    },
+    {
+      "nome": "Análise de Dezenas",
+      "id": "dezenas",
+      "peso": 1,
+      "desc": "Equilibra dezenas 1-10, 11-20...",
+      "mediaAcertos": 0.725,
+      "melhorAcerto": 3
+    },
+    {
+      "nome": "Clusterização Espacial",
+      "id": "cluster",
+      "peso": 1,
+      "desc": "Grupos próximos no cartão",
+      "mediaAcertos": 0.72,
+      "melhorAcerto": 3
+    },
+    {
+      "nome": "Clusters Numéricos",
+      "id": "clusters",
+      "peso": 1,
+      "desc": "Grupos consecutivos",
+      "mediaAcertos": 0.72,
+      "melhorAcerto": 3
+    },
+    {
+      "nome": "Paridade Dinâmica",
+      "id": "paridade",
+      "peso": 1,
+      "desc": "Equilibra pares e ímpares",
+      "mediaAcertos": 0.715,
+      "melhorAcerto": 3
+    },
+    {
+      "nome": "Sequência Histórica",
+      "id": "sequencia",
+      "peso": 1,
+      "desc": "Sequências recorrentes",
+      "mediaAcertos": 0.69,
+      "melhorAcerto": 3
+    },
+    {
+      "nome": "Distribuição Geométrica",
+      "id": "geometrica",
+      "peso": 1,
+      "desc": "Distribuição espacial",
+      "mediaAcertos": 0.68,
+      "melhorAcerto": 2
+    },
+    {
+      "nome": "Posição das Bolas",
+      "id": "posicao",
+      "peso": 1,
+      "desc": "Frequência por posição de saída",
+      "mediaAcertos": 0.675,
+      "melhorAcerto": 3
+    },
+    {
+      "nome": "Regressão Estatística",
+      "id": "regressao",
+      "peso": 1,
+      "desc": "Modelo preditivo",
+      "mediaAcertos": 0.66,
+      "melhorAcerto": 3
+    },
+    {
+      "nome": "Fibonacci Ponderado",
+      "id": "fibonacci",
+      "peso": 1,
+      "desc": "Fibonacci + atraso",
+      "mediaAcertos": 0.635,
+      "melhorAcerto": 3
+    },
+    {
+      "nome": "Dígitos Significativos",
+      "id": "digitos",
+      "peso": 1,
+      "desc": "Frequência por dígito",
+      "mediaAcertos": 0.605,
+      "melhorAcerto": 2
+    },
+    {
+      "nome": "Múltiplos Estratégicos",
+      "id": "multiplos",
+      "peso": 1,
+      "desc": "Múltiplos de 3, 7, 11",
+      "mediaAcertos": 0.59,
+      "melhorAcerto": 3
+    },
+    {
+      "nome": "Soma Média Otimizada",
+      "id": "soma",
+      "peso": 1,
+      "desc": "Soma próxima à média (186)",
+      "mediaAcertos": 0.55,
+      "melhorAcerto": 2
+    },
+    {
+      "nome": "Atraso Relativo",
+      "id": "atraso",
+      "peso": 1,
+      "desc": "Atrasados + quentes",
+      "mediaAcertos": 0.525,
+      "melhorAcerto": 4
+    },
+    {
+      "nome": "Ciclo de Atraso",
+      "id": "cicloatraso",
+      "peso": 1,
+      "desc": "Ciclos de atraso",
+      "mediaAcertos": 0.525,
+      "melhorAcerto": 4
+    }
+  ],
+  "pesosAprendidos": {},
+  "historicoEvolucao": [
+    {
+      "timestamp": "2026-05-19T14:46:12.655Z",
+      "geracao": 1,
+      "pesos": {}
+    },
+    {
+      "timestamp": "2026-05-19T14:46:22.622Z",
+      "geracao": 2,
+      "pesos": {}
+    },
+    {
+      "timestamp": "2026-05-19T14:46:32.632Z",
+      "geracao": 3,
+      "pesos": {}
+    },
+    {
+      "timestamp": "2026-05-19T14:46:42.618Z",
+      "geracao": 4,
+      "pesos": {}
+    },
+    {
+      "timestamp": "2026-05-19T14:46:52.619Z",
+      "geracao": 5,
+      "pesos": {}
+    },
+    {
+      "timestamp": "2026-05-19T14:47:02.610Z",
+      "geracao": 6,
+      "pesos": {}
+    },
+    {
+      "timestamp": "2026-05-19T14:47:12.623Z",
+      "geracao": 7,
+      "pesos": {}
+    },
+    {
+      "timestamp": "2026-05-19T14:47:22.615Z",
+      "geracao": 8,
+      "pesos": {}
+    },
+    {
+      "timestamp": "2026-05-19T14:47:32.627Z",
+      "geracao": 9,
+      "pesos": {}
+    },
+    {
+      "timestamp": "2026-05-19T14:47:42.635Z",
+      "geracao": 10,
+      "pesos": {}
+    },
+    {
+      "timestamp": "2026-05-19T14:47:52.627Z",
+      "geracao": 11,
+      "pesos": {}
+    },
+    {
+      "timestamp": "2026-05-19T14:48:02.609Z",
+      "geracao": 12,
+      "pesos": {}
+    },
+    {
+      "timestamp": "2026-05-19T14:48:20.133Z",
+      "geracao": 13,
+      "pesos": {}
+    },
+    {
+      "timestamp": "2026-05-19T14:48:30.135Z",
+      "geracao": 14,
+      "pesos": {}
+    },
+    {
+      "timestamp": "2026-05-19T14:48:40.129Z",
+      "geracao": 15,
+      "pesos": {}
+    },
+    {
+      "timestamp": "2026-05-19T14:48:50.137Z",
+      "geracao": 16,
+      "pesos": {}
+    },
+    {
+      "timestamp": "2026-05-19T14:49:00.129Z",
+      "geracao": 17,
+      "pesos": {}
+    },
+    {
+      "timestamp": "2026-05-19T14:49:41.138Z",
+      "geracao": 18,
+      "pesos": {}
+    },
+    {
+      "timestamp": "2026-05-19T14:52:56.837Z",
+      "geracao": 19,
+      "pesos": {}
+    }
+  ],
+  "totalAnalises": 19,
+  "ultimaAtualizacao": "2026-05-19T14:52:56.836Z",
+  "aprendizadoPorResultado": [],
+  "salvoEm": "2026-05-19T14:52:57.187Z"
+}
