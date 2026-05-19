@@ -2775,6 +2775,11 @@ window.addEventListener('load', function() {
             }
         });
     }
+
+    // Aplicar a nova UI intuitiva
+    if (typeof aplicarNovaUI === 'function') {
+        aplicarNovaUI();
+    }
 });
 </script>
 
@@ -2795,5 +2800,8 @@ window.addEventListener('load', function() {
 
 <!-- ⚡ MÓDULO DE AUTOMAÇÃO E PERFORMANCE IA -->
 <script src="ia-automacao-performance.js"></script>
+
+<!-- 🎨 MÓDULO DE UI INTUITIVA -->
+<script src="ui-intuitiva.js"></script>
 </body>
 </html>
