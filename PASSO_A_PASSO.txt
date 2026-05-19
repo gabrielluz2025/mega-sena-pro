@@ -1,0 +1,76 @@
+============================================
+PASSO A PASSO - SUBIR PARA GITHUB
+============================================
+
+ERRO: "not a git repository"
+
+SOLUCAO COMPLETA:
+
+1. ABRA O TERMINAL (CMD)
+   - Pressione: Windows + R
+   - Digite: cmd
+   - Aperte ENTER
+
+2. VAI ATE A PASTA:
+   cd "C:\Users\xgame\Downloads\MEGA SENA"
+
+3. CRIE O REPOSITORIO GIT:
+   git init
+
+4. CONFIGURE SEU EMAIL:
+   git config user.email "seuemail@exemplo.com"
+
+5. CONFIGURE SEU NOME:
+   git config user.name "Seu Nome"
+
+6. CONFIGURE O GITHUB (troque SEU_USUARIO):
+   git remote add origin https://github.com/SEU_USUARIO/mega-sena-pro.git
+
+   Exemplo:
+   git remote add origin https://github.com/joao/mega-sena-pro.git
+
+7. ADICIONE OS ARQUIVOS:
+   git add pro.html
+   git add server.js
+   git add data.json
+   git add concursos.json
+   git add package.json
+   git add render.yaml
+   git add .gitignore
+
+8. CRIE O COMMIT:
+   git commit -m "Mega Sena PRO v2"
+
+9. ENVIE PARA O GITHUB:
+   git push -u origin main
+
+   Se pedir senha, use seu token do GitHub.
+
+10. PRONTO!
+
+============================================
+SE DER ERRO DE AUTHENTICATION:
+============================================
+
+Voce precisa de um token do GitHub:
+
+1. Acesse: https://github.com/settings/tokens
+2. Clique: "Generate new token"
+3. Marque: "repo" (acesso completo)
+4. Gere o token
+5. Guarde o token (ele aparece so uma vez!)
+6. Use o token como senha quando pedir
+
+============================================
+COMANDOS RAPIDOS (copie e cole):
+============================================
+
+git init
+git config user.email "teste@teste.com"
+git config user.name "Teste"
+git remote add origin https://github.com/SEU_USUARIO/mega-sena-pro.git
+git add .
+git commit -m "Primeiro commit"
+git push -u origin main
+
+============================================

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Testar Checkpoint - Mega Sena PRO</title>
+    <style>
+        body { font-family: Arial; padding: 20px; background: #1a1a2e; color: #fff; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; font-size: 14px; }
+        .verificar { background: #4CAF50; color: white; }
+        .salvar { background: #2196F3; color: white; }
+        .carregar { background: #FF9800; color: white; }
+        .apagar { background: #f44336; color: white; }
+        #resultado { background: #16213e; padding: 15px; margin-top: 20px; border-radius: 5px; white-space: pre-wrap; font-family: monospace; }
+        h1 { color: #4CAF50; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Teste de Checkpoint - Mega Sena PRO</h1>
+    <p>Ferramenta para testar se os endpoints de checkpoint estão funcionando.</p>
+    
+    <button class="verificar" onclick="verificar()">1. Verificar Checkpoint</button>
+    <button class="salvar" onclick="salvar()">2. Salvar Teste</button>
+    <button class="carregar" onclick="carregar()">3. Carregar Checkpoint</button>
+    <button class="apagar" onclick="apagar()">4. Apagar Checkpoint</button>
+    
+    <div id="resultado">Clique nos botões para testar...</div>
+
+    <script>
+        const resultado = document.getElementById('resultado');
+        
+        function log(msg) {
+            resultado.textContent += '\n' + msg;
+            console.log(msg);
+        }
+        
+        async function verificar() {
+            resultado.textContent = '🔍 Verificando se existe checkpoint...';
+            try {
+                const response = await fetch('/api/existe-checkpoint');
+                const data = await response.json();
+                log(`✅ Resposta: ${JSON.stringify(data)}`);
+                if (data.existe) {
+                    log('💾 CHECKPOINT EXISTE!');
+                } else {
+                    log('❌ Nenhum checkpoint encontrado');
+                }
+            } catch (e) {
+                log(`❌ ERRO: ${e.message}`);
+                log('🚨 O servidor pode não estar rodando ou endpoint não existe!');
+            }
+        }
+        
+        async function salvar() {
+            resultado.textContent = '💾 Salvando checkpoint de teste...';
+            const teste = {
+                geracaoAtual: 99,
+                populacao: [{regras: {pesoFrequencia: 0.5}, fitness: 3.5}],
+                melhorIndividuo: {regras: {pesoFrequencia: 0.8}, fitness: 4.2},
+                historicoPrevisoes: [],
+                teste: true,
+                data: new Date().toISOString()
+            };
+            
+            try {
+                const response = await fetch('/api/salvar-checkpoint', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(teste)
+                });
+                const data = await response.json();
+                log(`✅ Resposta: ${JSON.stringify(data)}`);
+                if (data.sucesso) {
+                    log('✅ Checkpoint salvo com sucesso!');
+                } else {
+                    log('❌ Erro ao salvar');
+                }
+            } catch (e) {
+                log(`❌ ERRO: ${e.message}`);
+            }
+        }
+        
+        async function carregar() {
+            resultado.textContent = '💾 Carregando checkpoint...';
+            try {
+                const response = await fetch('/api/carregar-checkpoint');
+                const data = await response.json();
+                log(`✅ Resposta: ${JSON.stringify(data, null, 2)}`);
+                if (data.sucesso) {
+                    log(`✅ Checkpoint carregado! Geração: ${data.dados?.geracaoAtual}`);
+                } else {
+                    log('❌ Nenhum checkpoint para carregar');
+                }
+            } catch (e) {
+                log(`❌ ERRO: ${e.message}`);
+            }
+        }
+        
+        async function apagar() {
+            resultado.textContent = '🗑️ Apagando checkpoint...';
+            try {
+                const response = await fetch('/api/apagar-checkpoint', {method: 'DELETE'});
+                const data = await response.json();
+                log(`✅ Resposta: ${JSON.stringify(data)}`);
+                if (data.sucesso) {
+                    log('🗑️ Checkpoint apagado!');
+                } else {
+                    log('❌ Não foi possível apagar (pode não existir)');
+                }
+            } catch (e) {
+                log(`❌ ERRO: ${e.message}`);
+            }
+        }
+    </script>
+</body>
+</html>
