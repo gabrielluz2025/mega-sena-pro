@@ -188,6 +188,9 @@ function renderizarPlacarRankingElite() {
             <div class="flex items-center justify-between">
                 <h2 class="text-2xl font-bold gradient-text-purple">🏆 Ranking de Elite — Inteligência Artificial</h2>
                 <div class="flex gap-2">
+                    <button onclick="toggleFullTime()" class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-xl transition text-sm flex items-center gap-2 shadow-lg shadow-red-500/20">
+                        <i class="fas fa-server"></i> Full-Time (Server)
+                    </button>
                     <button onclick="iniciarAnalisePorEstrategia()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl transition text-sm flex items-center gap-2">
                         <i class="fas fa-sync"></i> Recalcular Ranking
                     </button>

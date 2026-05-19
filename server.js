@@ -2,6 +2,7 @@ const express = require('express');
 const fs = require('fs').promises;
 const path = require('path');
 const cors = require('cors');
+const backgroundIA = require('./treinamento-background');
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -289,6 +290,21 @@ app.get('/api/status', async (req, res) => {
     }
     
     res.json(status);
+});
+
+// Endpoints de Controle do Treinamento Full-Time
+app.post('/api/admin/treinamento/iniciar', (req, res) => {
+    backgroundIA.iniciarTreinamentoBackground();
+    res.json({ sucesso: true, mensagem: 'Treinamento Full-Time iniciado' });
+});
+
+app.post('/api/admin/treinamento/parar', (req, res) => {
+    backgroundIA.pararTreinamentoBackground();
+    res.json({ sucesso: true, mensagem: 'Treinamento Full-Time parado' });
+});
+
+app.get('/api/admin/treinamento/status', (req, res) => {
+    res.json(backgroundIA.status());
 });
 
 // Iniciar servidor
