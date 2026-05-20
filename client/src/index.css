@@ -189,29 +189,28 @@
 
 @layer components {
   .glass-panel {
-    @apply bg-opacity-20 backdrop-blur-md border border-opacity-20 rounded-lg;
+    @apply backdrop-blur-md rounded-lg;
     background-color: var(--glass-bg);
-    border-color: var(--glass-border);
+    border: 1px solid var(--glass-border);
   }
 
   .glass-card {
-    @apply glass-panel p-6 shadow-2xl transition-all duration-300 hover:shadow-2xl hover:border-opacity-40;
+    @apply p-6 shadow-2xl transition-all duration-300 hover:shadow-2xl backdrop-blur-md rounded-lg;
+    background-color: var(--glass-bg);
+    border: 1px solid var(--glass-border);
   }
 
   .neon-glow-green {
-    @apply text-opacity-100;
     color: var(--neon-green);
     text-shadow: 0 0 10px var(--neon-green), 0 0 20px var(--neon-green);
   }
 
   .neon-glow-blue {
-    @apply text-opacity-100;
     color: var(--neon-blue);
     text-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue);
   }
 
   .neon-glow-purple {
-    @apply text-opacity-100;
     color: var(--neon-purple);
     text-shadow: 0 0 10px var(--neon-purple), 0 0 20px var(--neon-purple);
   }
@@ -221,15 +220,21 @@
   }
 
   .bento-item {
-    @apply glass-card;
+    @apply p-6 shadow-2xl transition-all duration-300 hover:shadow-2xl backdrop-blur-md rounded-lg;
+    background-color: var(--glass-bg);
+    border: 1px solid var(--glass-border);
   }
 
   .bento-item-large {
-    @apply glass-card md:col-span-2 lg:col-span-2;
+    @apply p-6 shadow-2xl transition-all duration-300 hover:shadow-2xl backdrop-blur-md rounded-lg md:col-span-2 lg:col-span-2;
+    background-color: var(--glass-bg);
+    border: 1px solid var(--glass-border);
   }
 
   .bento-item-tall {
-    @apply glass-card row-span-2;
+    @apply p-6 shadow-2xl transition-all duration-300 hover:shadow-2xl backdrop-blur-md rounded-lg row-span-2;
+    background-color: var(--glass-bg);
+    border: 1px solid var(--glass-border);
   }
 
   .gradient-border {
